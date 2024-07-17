@@ -13,6 +13,7 @@ import (
 	"github.com/fatih/color"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -23,7 +24,7 @@ type server struct {
 }
 
 func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
-	log.Println(color.BlueString("Create user: %+v, with ctx: %v", req, ctx))
+	log.Println(color.BlueString("Create user: %v, with ctx: %v", req, ctx))
 	return &desc.CreateResponse{
 		Id: gofakeit.Int64(),
 	}, nil
@@ -46,6 +47,15 @@ func (s *server) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetRespon
 		CreatedAt: timestamppb.New(gofakeit.Date()),
 		UpdatedAt: timestamppb.New(gofakeit.Date()),
 	}, nil
+}
+
+func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
+	log.Println(color.HiMagentaString("Delete user: id %d, with ctx: %v", req.Id, ctx))
+	return &emptypb.Empty{}, nil
+}
+
+func (s *server) Update(ctx context.Context, req *desc.UpdateRequest) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, nil
 }
 
 func main() {
