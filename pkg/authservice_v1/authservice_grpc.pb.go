@@ -23,10 +23,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthserviceV1Client interface {
-	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
-	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
-	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type authserviceV1Client struct {
@@ -37,36 +37,36 @@ func NewAuthserviceV1Client(cc grpc.ClientConnInterface) AuthserviceV1Client {
 	return &authserviceV1Client{cc}
 }
 
-func (c *authserviceV1Client) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
-	out := new(CreateResponse)
-	err := c.cc.Invoke(ctx, "/authservice_v1.Authservice_v1/Create", in, out, opts...)
+func (c *authserviceV1Client) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	out := new(CreateUserResponse)
+	err := c.cc.Invoke(ctx, "/authservice_v1.Authservice_v1/CreateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authserviceV1Client) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
-	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/authservice_v1.Authservice_v1/Get", in, out, opts...)
+func (c *authserviceV1Client) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
+	out := new(GetUserResponse)
+	err := c.cc.Invoke(ctx, "/authservice_v1.Authservice_v1/GetUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authserviceV1Client) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *authserviceV1Client) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/authservice_v1.Authservice_v1/Update", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authservice_v1.Authservice_v1/UpdateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authserviceV1Client) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *authserviceV1Client) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/authservice_v1.Authservice_v1/Delete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/authservice_v1.Authservice_v1/DeleteUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +77,10 @@ func (c *authserviceV1Client) Delete(ctx context.Context, in *DeleteRequest, opt
 // All implementations must embed UnimplementedAuthserviceV1Server
 // for forward compatibility
 type AuthserviceV1Server interface {
-	Create(context.Context, *CreateRequest) (*CreateResponse, error)
-	Get(context.Context, *GetRequest) (*GetResponse, error)
-	Update(context.Context, *UpdateRequest) (*empty.Empty, error)
-	Delete(context.Context, *DeleteRequest) (*empty.Empty, error)
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
+	UpdateUser(context.Context, *UpdateUserRequest) (*empty.Empty, error)
+	DeleteUser(context.Context, *DeleteUserRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedAuthserviceV1Server()
 }
 
@@ -88,17 +88,17 @@ type AuthserviceV1Server interface {
 type UnimplementedAuthserviceV1Server struct {
 }
 
-func (UnimplementedAuthserviceV1Server) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (UnimplementedAuthserviceV1Server) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedAuthserviceV1Server) Get(context.Context, *GetRequest) (*GetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+func (UnimplementedAuthserviceV1Server) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
-func (UnimplementedAuthserviceV1Server) Update(context.Context, *UpdateRequest) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+func (UnimplementedAuthserviceV1Server) UpdateUser(context.Context, *UpdateUserRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
-func (UnimplementedAuthserviceV1Server) Delete(context.Context, *DeleteRequest) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+func (UnimplementedAuthserviceV1Server) DeleteUser(context.Context, *DeleteUserRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
 func (UnimplementedAuthserviceV1Server) mustEmbedUnimplementedAuthserviceV1Server() {}
 
@@ -113,74 +113,74 @@ func RegisterAuthserviceV1Server(s grpc.ServiceRegistrar, srv AuthserviceV1Serve
 	s.RegisterService(&AuthserviceV1_ServiceDesc, srv)
 }
 
-func _AuthserviceV1_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateRequest)
+func _AuthserviceV1_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthserviceV1Server).Create(ctx, in)
+		return srv.(AuthserviceV1Server).CreateUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice_v1.Authservice_v1/Create",
+		FullMethod: "/authservice_v1.Authservice_v1/CreateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthserviceV1Server).Create(ctx, req.(*CreateRequest))
+		return srv.(AuthserviceV1Server).CreateUser(ctx, req.(*CreateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthserviceV1_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
+func _AuthserviceV1_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthserviceV1Server).Get(ctx, in)
+		return srv.(AuthserviceV1Server).GetUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice_v1.Authservice_v1/Get",
+		FullMethod: "/authservice_v1.Authservice_v1/GetUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthserviceV1Server).Get(ctx, req.(*GetRequest))
+		return srv.(AuthserviceV1Server).GetUser(ctx, req.(*GetUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthserviceV1_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateRequest)
+func _AuthserviceV1_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthserviceV1Server).Update(ctx, in)
+		return srv.(AuthserviceV1Server).UpdateUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice_v1.Authservice_v1/Update",
+		FullMethod: "/authservice_v1.Authservice_v1/UpdateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthserviceV1Server).Update(ctx, req.(*UpdateRequest))
+		return srv.(AuthserviceV1Server).UpdateUser(ctx, req.(*UpdateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthserviceV1_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteRequest)
+func _AuthserviceV1_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthserviceV1Server).Delete(ctx, in)
+		return srv.(AuthserviceV1Server).DeleteUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice_v1.Authservice_v1/Delete",
+		FullMethod: "/authservice_v1.Authservice_v1/DeleteUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthserviceV1Server).Delete(ctx, req.(*DeleteRequest))
+		return srv.(AuthserviceV1Server).DeleteUser(ctx, req.(*DeleteUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -193,20 +193,20 @@ var AuthserviceV1_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthserviceV1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Create",
-			Handler:    _AuthserviceV1_Create_Handler,
+			MethodName: "CreateUser",
+			Handler:    _AuthserviceV1_CreateUser_Handler,
 		},
 		{
-			MethodName: "Get",
-			Handler:    _AuthserviceV1_Get_Handler,
+			MethodName: "GetUser",
+			Handler:    _AuthserviceV1_GetUser_Handler,
 		},
 		{
-			MethodName: "Update",
-			Handler:    _AuthserviceV1_Update_Handler,
+			MethodName: "UpdateUser",
+			Handler:    _AuthserviceV1_UpdateUser_Handler,
 		},
 		{
-			MethodName: "Delete",
-			Handler:    _AuthserviceV1_Delete_Handler,
+			MethodName: "DeleteUser",
+			Handler:    _AuthserviceV1_DeleteUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
