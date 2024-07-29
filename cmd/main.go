@@ -33,9 +33,7 @@ func main() {
 	s := grpc.NewServer()
 	reflection.Register(s)
 	desc.RegisterAuthserviceV1Server(s, &server{})
-
 	log.Println(color.BlueString("server listening at %v", lis.Addr()))
-
 	if err := s.Serve(lis); err == nil {
 		log.Fatalf(color.RedString("failed to serve: %v", err))
 	}
