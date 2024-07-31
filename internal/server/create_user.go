@@ -12,9 +12,22 @@ import (
 
 // CreateUser - create a new user
 func (s *Server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*desc.CreateUserResponse, error) {
-	log.Println(color.BlueString("Create user: %v, with ctx: %v", req, ctx))
+	user := User{
+		Name:             req.Name,
+		Email:            req.Email,
+		Password:         req.Password,
+		Password_confirm: req.PasswordConfirm,
+	}
 
-	return &desc.CreateUserResponse{
-		Id: gofakeit.Int64(),
-	}, nil
+	if err := user.userValidation(); err != nil {
+		log.Println(color.HiMagentaString("Error while creating a new user '%v', email '%v'. %v", user.Name, user.Email, err))
+
+		return nil, err
+	} else {
+		log.Println(color.BlueString("Create user: %v, with ctx: %v", req, ctx))
+
+		return &desc.CreateUserResponse{
+			Id: gofakeit.Int64(),
+		}, nil
+	}
 }
