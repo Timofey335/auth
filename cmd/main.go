@@ -2,31 +2,45 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
 	"time"
 
-	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
-	"golang.org/x/exp/rand"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	desc "github.com/Timofey335/auth/pkg/authservice_v1"
 )
 
-const grpcPort = 50051
+const (
+	grpcPort = 50051
+	dbDSN    = "host=localhost port=54321 dbname=users user=user password=userspassword sslmode=disable"
+)
 
 type server struct {
 	desc.UnimplementedAuthserviceV1Server
+	pool *pgxpool.Pool
 }
 
 func main() {
+	ctx := context.Background()
+
+	pool, err := pgxpool.Connect(ctx, dbDSN)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	defer pool.Close()
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
 		log.Fatalf(color.RedString("failed listen: %v", err))
@@ -34,7 +48,7 @@ func main() {
 
 	s := grpc.NewServer()
 	reflection.Register(s)
-	desc.RegisterAuthserviceV1Server(s, &server{})
+	desc.RegisterAuthserviceV1Server(s, &server{pool: pool})
 	log.Println(color.BlueString("server listening at %v", lis.Addr()))
 	if err := s.Serve(lis); err == nil {
 		log.Fatalf(color.RedString("failed to serve: %v", err))
@@ -49,7 +63,7 @@ type User struct {
 	Password_confirm string
 	Role             desc.Role
 	CreatedAt        time.Time
-	UpdatedAt        time.Time
+	UpdatedAt        sql.NullTime
 }
 
 func (u User) userValidation() error {
@@ -71,6 +85,7 @@ func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*
 		Email:            req.Email,
 		Password:         req.Password,
 		Password_confirm: req.PasswordConfirm,
+		Role:             req.Role,
 	}
 
 	if err := user.userValidation(); err != nil {
@@ -78,33 +93,43 @@ func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*
 
 		return nil, err
 	} else {
+		var userId int64
+		err = s.pool.QueryRow(ctx, "INSERT INTO users (name, email, password, role, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id;", &user.Name, &user.Email, &user.Password, &user.Role, time.Now()).Scan(&userId)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
 		log.Println(color.BlueString("Create user: %v, with ctx: %v", req, ctx))
 
 		return &desc.CreateUserResponse{
-			Id: gofakeit.Int64(),
+			Id: userId,
 		}, nil
+
 	}
-}
-
-func getUserRole() desc.Role {
-	roles := []desc.Role{desc.Role_UNKNOWN, desc.Role_USER, desc.Role_ADMIN}
-	rand.NewSource(uint64(time.Now().UnixNano()))
-	randomRole := rand.Intn(len(roles))
-
-	return roles[randomRole]
 }
 
 // GetUser - get information of the user by id
 func (s *server) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.GetUserResponse, error) {
-	log.Println(color.BlueString("Note id: %d", req.GetId()))
+	var user User
+	err := s.pool.QueryRow(ctx, "SELECT id, name, email, role, created_at, updated_at FROM users WHERE id = $1", req.Id).Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	log.Println(color.BlueString("Get user by id: %d", req.GetId()))
+
+	var updatedAtTime *timestamppb.Timestamp
+	if user.UpdatedAt.Valid {
+		updatedAtTime = timestamppb.New(user.UpdatedAt.Time)
+	}
 
 	return &desc.GetUserResponse{
-		Id:        gofakeit.Int64(),
-		Name:      gofakeit.Name(),
-		Email:     gofakeit.Email(),
-		Role:      getUserRole(),
-		CreatedAt: timestamppb.New(gofakeit.Date()),
-		UpdatedAt: timestamppb.New(gofakeit.Date()),
+		Id:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
+		Role:      user.Role,
+		CreatedAt: timestamppb.New(user.CreatedAt),
+		UpdatedAt: updatedAtTime,
 	}, nil
 }
 
