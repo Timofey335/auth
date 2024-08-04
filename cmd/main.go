@@ -92,7 +92,7 @@ func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*
 								VALUES ($1, $2, $3, $4, $5)
 								RETURNING id;`, req.Name, req.Email, req.Password, req.Role, time.Now()).Scan(&userId)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
 	log.Println(color.BlueString("create user: %v, with ctx: %v", req, ctx))
@@ -192,7 +192,14 @@ func (s *server) UpdateUser(ctx context.Context, req *desc.UpdateUserRequest) (*
 
 // DeleteUser - delete a user by id
 func (s *server) DeleteUser(ctx context.Context, req *desc.DeleteUserRequest) (*emptypb.Empty, error) {
-	log.Println(color.HiMagentaString("Delete user: id %d, with ctx: %v", req.Id, ctx))
+	var userId int64
+	err := s.pool.QueryRow(ctx, `DELETE FROM users WHERE id = $1 RETURNING id`, req.Id).Scan(&userId)
+	if err != nil {
+		log.Println(color.HiMagentaString("error while deleting the user: %v, with ctx: %v", err, ctx))
+		return nil, err
+	}
+
+	log.Println(color.HiMagentaString("deleted the user: id %v, with ctx: %v", userId, ctx))
 
 	return &emptypb.Empty{}, nil
 }
