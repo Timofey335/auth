@@ -25,6 +25,7 @@ generate-note-api:
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=pkg/authservice_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+	--experimental_allow_proto3_optional \
 	api/authservice_v1/authservice.proto
 
 local-migration-status:

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -89,17 +90,20 @@ func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*
 	}
 
 	if err := user.userValidation(); err != nil {
-		log.Println(color.HiMagentaString("Error while creating a new user '%v', email '%v'. %v", user.Name, user.Email, err))
+		log.Println(color.HiMagentaString("error while creating a new user '%v', email '%v'. %v", user.Name, user.Email, err))
 
 		return nil, err
 	} else {
 		var userId int64
-		err = s.pool.QueryRow(ctx, "INSERT INTO users (name, email, password, role, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id;", &user.Name, &user.Email, &user.Password, &user.Role, time.Now()).Scan(&userId)
+		err = s.pool.QueryRow(ctx, `INSERT INTO 
+									users (name, email, password, role, created_at) 
+									VALUES ($1, $2, $3, $4, $5)
+									RETURNING id;`, &user.Name, &user.Email, &user.Password, &user.Role, time.Now()).Scan(&userId)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 
-		log.Println(color.BlueString("Create user: %v, with ctx: %v", req, ctx))
+		log.Println(color.BlueString("create user: %v, with ctx: %v", req, ctx))
 
 		return &desc.CreateUserResponse{
 			Id: userId,
@@ -111,7 +115,8 @@ func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*
 // GetUser - get information of the user by id
 func (s *server) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.GetUserResponse, error) {
 	var user User
-	err := s.pool.QueryRow(ctx, "SELECT id, name, email, role, created_at, updated_at FROM users WHERE id = $1", req.Id).Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+	err := s.pool.QueryRow(ctx, `SELECT id, name, email, role, created_at, updated_at 
+								FROM users WHERE id = $1`, req.Id).Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -135,6 +140,58 @@ func (s *server) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.G
 
 // UpdateUser - update information of the user by id
 func (s *server) UpdateUser(ctx context.Context, req *desc.UpdateUserRequest) (*emptypb.Empty, error) {
+	var name, password string
+	var role desc.Role
+
+	if req.Name != nil {
+		name = req.Name.Value
+		err := validation.Validate(name, validation.Required, validation.Length(2, 50))
+		if err != nil {
+			log.Println(color.HiMagentaString("error while updating the user with id '%v'. %v", req.Id, err))
+
+			return nil, err
+		}
+	}
+
+	if req.Password != nil {
+		password = req.Password.Value
+		if password != req.PasswordConfirm.Value {
+			err := errors.New("password doesn't match")
+			log.Println(color.HiMagentaString("error while updating password the user with id '%v; %v'", req.Id, err))
+
+			return nil, err
+		}
+
+		err := validation.Validate(&password, validation.Required, validation.Length(8, 50))
+		if err != nil {
+			log.Println(color.HiMagentaString("error while updating password the user with id '%v'; %v", req.Id, err))
+
+			return nil, err
+		}
+
+	}
+
+	if req.Role != nil {
+		role = *req.Role
+	}
+
+	res, err := s.pool.Exec(ctx, `UPDATE users SET
+								name = CASE WHEN $1 = true THEN $2 ELSE name END,
+								password = CASE WHEN $3 = true THEN $4 ELSE password END,
+								role = CASE WHEN $5 = true THEN $6 ELSE role END,
+								updated_at = $7
+								WHERE id = $8;`, req.Name != nil, name, req.Password != nil, password, req.Role != nil, role, time.Now(), req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	rowsAffected := res.RowsAffected()
+	if rowsAffected == 0 {
+		return nil, fmt.Errorf("updating failed")
+	}
+
+	log.Println(color.BlueString("updated the user %v, with ctx: %v", req, ctx))
+
 	return &emptypb.Empty{}, nil
 }
 
