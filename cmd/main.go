@@ -56,67 +56,62 @@ func main() {
 	}
 }
 
-type User struct {
-	ID               int64
-	Name             string
-	Email            string
-	Password         string
-	Password_confirm string
-	Role             desc.Role
-	CreatedAt        time.Time
-	UpdatedAt        sql.NullTime
-}
-
-func (u User) userValidation() error {
-	if u.Password != u.Password_confirm {
-		return fmt.Errorf("password doesn't match")
-	} else {
-		return validation.ValidateStruct(&u,
-			validation.Field(&u.Name, validation.Required, validation.Length(2, 50)),
-			validation.Field(&u.Email, validation.Required, is.Email),
-			validation.Field(&u.Password, validation.Required, validation.Length(8, 50)),
-		)
-	}
-}
-
 // CreateUser - create a new user
 func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*desc.CreateUserResponse, error) {
-	user := User{
-		Name:             req.Name,
-		Email:            req.Email,
-		Password:         req.Password,
-		Password_confirm: req.PasswordConfirm,
-		Role:             req.Role,
-	}
-
-	if err := user.userValidation(); err != nil {
-		log.Println(color.HiMagentaString("error while creating a new user '%v', email '%v'. %v", user.Name, user.Email, err))
+	err := validation.Validate(req.Name, validation.Required, validation.Length(2, 50))
+	if err != nil {
+		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
 
 		return nil, err
-	} else {
-		var userId int64
-		err = s.pool.QueryRow(ctx, `INSERT INTO 
-									users (name, email, password, role, created_at) 
-									VALUES ($1, $2, $3, $4, $5)
-									RETURNING id;`, &user.Name, &user.Email, &user.Password, &user.Role, time.Now()).Scan(&userId)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		log.Println(color.BlueString("create user: %v, with ctx: %v", req, ctx))
-
-		return &desc.CreateUserResponse{
-			Id: userId,
-		}, nil
-
 	}
+
+	err = validation.Validate(req.Email, validation.Required, is.Email)
+	if err != nil {
+		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
+
+		return nil, err
+	}
+
+	if req.Password != req.PasswordConfirm {
+		err := errors.New("password doesn't match")
+		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
+
+		return nil, err
+	}
+
+	err = validation.Validate(req.Password, validation.Required, validation.Length(8, 50))
+	if err != nil {
+		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
+
+		return nil, err
+	}
+
+	var userId int64
+	err = s.pool.QueryRow(ctx, `INSERT INTO 
+								users (name, email, password, role, created_at) 
+								VALUES ($1, $2, $3, $4, $5)
+								RETURNING id;`, req.Name, req.Email, req.Password, req.Role, time.Now()).Scan(&userId)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	log.Println(color.BlueString("create user: %v, with ctx: %v", req, ctx))
+
+	return &desc.CreateUserResponse{
+		Id: userId,
+	}, nil
 }
 
 // GetUser - get information of the user by id
 func (s *server) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.GetUserResponse, error) {
-	var user User
+	var id int64
+	var name, email string
+	var role desc.Role
+	var createdAt time.Time
+	var updatedAt sql.NullTime
+
 	err := s.pool.QueryRow(ctx, `SELECT id, name, email, role, created_at, updated_at 
-								FROM users WHERE id = $1`, req.Id).Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+								FROM users WHERE id = $1`, req.Id).Scan(&id, &name, &email, &role, &createdAt, &updatedAt)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -124,16 +119,16 @@ func (s *server) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.G
 	log.Println(color.BlueString("Get user by id: %d", req.GetId()))
 
 	var updatedAtTime *timestamppb.Timestamp
-	if user.UpdatedAt.Valid {
-		updatedAtTime = timestamppb.New(user.UpdatedAt.Time)
+	if updatedAt.Valid {
+		updatedAtTime = timestamppb.New(updatedAt.Time)
 	}
 
 	return &desc.GetUserResponse{
-		Id:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		Role:      user.Role,
-		CreatedAt: timestamppb.New(user.CreatedAt),
+		Id:        id,
+		Name:      name,
+		Email:     email,
+		Role:      role,
+		CreatedAt: timestamppb.New(createdAt),
 		UpdatedAt: updatedAtTime,
 	}, nil
 }
@@ -147,7 +142,7 @@ func (s *server) UpdateUser(ctx context.Context, req *desc.UpdateUserRequest) (*
 		name = req.Name.Value
 		err := validation.Validate(name, validation.Required, validation.Length(2, 50))
 		if err != nil {
-			log.Println(color.HiMagentaString("error while updating the user with id '%v'. %v", req.Id, err))
+			log.Println(color.HiMagentaString("error while updating the user with id '%v'; %v", req.Id, err))
 
 			return nil, err
 		}
