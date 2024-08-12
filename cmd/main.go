@@ -109,7 +109,7 @@ func (s *server) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.G
 	var updatedAt sql.NullTime
 
 	err := s.pool.QueryRow(ctx, `SELECT id, name, email, role, created_at, updated_at 
-								FROM users WHERE id = $1`, req.Id).Scan(&id, &name, &email, &role, &createdAt, &updatedAt)
+	FROM users WHERE id = $1`, req.Id).Scan(&id, &name, &email, &role, &createdAt, &updatedAt)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
