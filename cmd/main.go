@@ -87,10 +87,8 @@ func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*
 	}
 
 	var userId int64
-	err = s.pool.QueryRow(ctx, `INSERT INTO 
-								users (name, email, password, role, created_at) 
-								VALUES ($1, $2, $3, $4, $5)
-								RETURNING id;`, req.Name, req.Email, req.Password, req.Role, time.Now()).Scan(&userId)
+	err = s.pool.QueryRow(ctx, `INSERT INTO users (name, email, password, role, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id;`,
+		req.Name, req.Email, req.Password, req.Role, time.Now()).Scan(&userId)
 	if err != nil {
 		return nil, err
 	}
@@ -170,12 +168,9 @@ func (s *server) UpdateUser(ctx context.Context, req *desc.UpdateUserRequest) (*
 		role = *req.Role
 	}
 
-	res, err := s.pool.Exec(ctx, `UPDATE users SET
-								name = CASE WHEN $1 = true THEN $2 ELSE name END,
-								password = CASE WHEN $3 = true THEN $4 ELSE password END,
-								role = CASE WHEN $5 = true THEN $6 ELSE role END,
-								updated_at = $7
-								WHERE id = $8;`, req.Name != nil, name, req.Password != nil, password, req.Role != nil, role, time.Now(), req.Id)
+	res, err := s.pool.Exec(ctx, `UPDATE users SET name = CASE WHEN $1 = true THEN $2 ELSE name END, password = CASE WHEN $3 = true THEN $4 ELSE password END,
+	role = CASE WHEN $5 = true THEN $6 ELSE role END, updated_at = $7 WHERE id = $8;`,
+		req.Name != nil, name, req.Password != nil, password, req.Role != nil, role, time.Now(), req.Id)
 	if err != nil {
 		return nil, err
 	}
