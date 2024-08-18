@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: authservice.proto
+// source: auth.proto
 
-package authservice_v1
+package auth_v1
 
 import (
 	context "context"
@@ -39,7 +39,7 @@ func NewAuthV1Client(cc grpc.ClientConnInterface) AuthV1Client {
 
 func (c *authV1Client) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
 	out := new(CreateUserResponse)
-	err := c.cc.Invoke(ctx, "/authservice_v1.Auth_v1/CreateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth_v1.Auth_v1/CreateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *authV1Client) CreateUser(ctx context.Context, in *CreateUserRequest, op
 
 func (c *authV1Client) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
 	out := new(GetUserResponse)
-	err := c.cc.Invoke(ctx, "/authservice_v1.Auth_v1/GetUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth_v1.Auth_v1/GetUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *authV1Client) GetUser(ctx context.Context, in *GetUserRequest, opts ...
 
 func (c *authV1Client) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/authservice_v1.Auth_v1/UpdateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth_v1.Auth_v1/UpdateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *authV1Client) UpdateUser(ctx context.Context, in *UpdateUserRequest, op
 
 func (c *authV1Client) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/authservice_v1.Auth_v1/DeleteUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth_v1.Auth_v1/DeleteUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func _AuthV1_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice_v1.Auth_v1/CreateUser",
+		FullMethod: "/auth_v1.Auth_v1/CreateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthV1Server).CreateUser(ctx, req.(*CreateUserRequest))
@@ -141,7 +141,7 @@ func _AuthV1_GetUser_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice_v1.Auth_v1/GetUser",
+		FullMethod: "/auth_v1.Auth_v1/GetUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthV1Server).GetUser(ctx, req.(*GetUserRequest))
@@ -159,7 +159,7 @@ func _AuthV1_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice_v1.Auth_v1/UpdateUser",
+		FullMethod: "/auth_v1.Auth_v1/UpdateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthV1Server).UpdateUser(ctx, req.(*UpdateUserRequest))
@@ -177,7 +177,7 @@ func _AuthV1_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice_v1.Auth_v1/DeleteUser",
+		FullMethod: "/auth_v1.Auth_v1/DeleteUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthV1Server).DeleteUser(ctx, req.(*DeleteUserRequest))
@@ -189,7 +189,7 @@ func _AuthV1_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(i
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AuthV1_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "authservice_v1.Auth_v1",
+	ServiceName: "auth_v1.Auth_v1",
 	HandlerType: (*AuthV1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -210,5 +210,5 @@ var AuthV1_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "authservice.proto",
+	Metadata: "auth.proto",
 }
