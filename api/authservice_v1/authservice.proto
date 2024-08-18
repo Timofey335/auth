@@ -8,7 +8,7 @@ import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/Timofey335/auth/pkg/authservice_v1;authservice_v1";
 
-service Authservice_v1 {
+service Auth_v1 {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
     rpc GetUser(GetUserRequest) returns (GetUserResponse);
     rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
