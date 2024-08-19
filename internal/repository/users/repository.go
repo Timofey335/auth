@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	repository "github.com/Timofey335/auth/internal"
+	repository "github.com/Timofey335/auth/internal/repository"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
