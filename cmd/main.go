@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	repository "github.com/Timofey335/auth/internal"
-	"github.com/Timofey335/auth/internal/repository/users"
+	repository "github.com/Timofey335/auth/internal/repository"
+	user "github.com/Timofey335/auth/internal/repository/user"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
@@ -40,7 +40,7 @@ func main() {
 		log.Fatalf(color.RedString("failed listen: %v", err))
 	}
 
-	usersRepo := users.NewRepository(pool)
+	usersRepo := user.NewRepository(pool)
 
 	s := grpc.NewServer()
 	reflection.Register(s)

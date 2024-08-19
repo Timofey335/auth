@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/Timofey335/auth/internal/repository/users/converter"
-	"github.com/Timofey335/auth/internal/repository/users/model"
+	"github.com/Timofey335/auth/internal/repository/user/converter"
+	"github.com/Timofey335/auth/internal/repository/user/model"
 	"github.com/fatih/color"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -81,7 +81,7 @@ func (r *repo) CreateUser(ctx context.Context, user *desc.CreateUserRequest) (in
 }
 
 func (r *repo) GetUser(ctx context.Context, userId int64) (*desc.GetUserResponse, error) {
-	var user model.Users
+	var user model.User
 
 	err := r.db.QueryRow(ctx, `SELECT id, name, email, role, created_at, updated_at
 		FROM users WHERE id = $1`, userId).Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
