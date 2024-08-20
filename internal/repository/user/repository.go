@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/Timofey335/auth/internal/model"
 	"github.com/Timofey335/auth/internal/repository/user/converter"
-	"github.com/Timofey335/auth/internal/repository/user/model"
 	"github.com/fatih/color"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	repository "github.com/Timofey335/auth/internal/repository"
-	desc "github.com/Timofey335/auth/pkg/auth_v1"
+	modelRepo "github.com/Timofey335/auth/internal/repository/user/model"
 )
 
 const (
@@ -39,7 +39,7 @@ func NewRepository(db *pgxpool.Pool) repository.UsersRepository {
 	return &repo{db: db}
 }
 
-func (r *repo) CreateUser(ctx context.Context, user *desc.CreateUserRequest) (int64, error) {
+func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) {
 	err := validation.Validate(user.Name, validation.Required, validation.Length(2, 50))
 	if err != nil {
 		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
@@ -80,8 +80,8 @@ func (r *repo) CreateUser(ctx context.Context, user *desc.CreateUserRequest) (in
 	return userId, nil
 }
 
-func (r *repo) GetUser(ctx context.Context, userId int64) (*desc.GetUserResponse, error) {
-	var user model.User
+func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
+	var user modelRepo.User
 
 	err := r.db.QueryRow(ctx, `SELECT id, name, email, role, created_at, updated_at
 		FROM users WHERE id = $1`, userId).Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
@@ -89,5 +89,5 @@ func (r *repo) GetUser(ctx context.Context, userId int64) (*desc.GetUserResponse
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return converter.ToUsersFromRepo(&user), nil
+	return converter.ToUserFromRepo(&user), nil
 }

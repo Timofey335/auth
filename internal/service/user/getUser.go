@@ -7,5 +7,10 @@ import (
 )
 
 func (s *serv) GetUser(ctx context.Context, id int64) (*model.User, error) {
-	return nil, nil
+	user, err := s.userRepository.GetUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

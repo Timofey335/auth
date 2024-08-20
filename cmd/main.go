@@ -11,8 +11,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	repository "github.com/Timofey335/auth/internal/repository"
+	"github.com/Timofey335/auth/internal/converter"
 	user "github.com/Timofey335/auth/internal/repository/user"
+	"github.com/Timofey335/auth/internal/service"
+	userService "github.com/Timofey335/auth/internal/service/user"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
@@ -23,7 +25,7 @@ const (
 
 type server struct {
 	desc.UnimplementedAuthV1Server
-	usersRepository repository.UsersRepository
+	userService service.UserService
 }
 
 func main() {
@@ -40,11 +42,12 @@ func main() {
 		log.Fatalf(color.RedString("failed listen: %v", err))
 	}
 
-	usersRepo := user.NewRepository(pool)
+	userRepo := user.NewRepository(pool)
+	userService := userService.NewService(userRepo)
 
 	s := grpc.NewServer()
 	reflection.Register(s)
-	desc.RegisterAuthV1Server(s, &server{usersRepository: usersRepo})
+	desc.RegisterAuthV1Server(s, &server{userService: userService})
 
 	log.Println(color.BlueString("server listening at %v", lis.Addr()))
 
@@ -54,7 +57,7 @@ func main() {
 }
 
 func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*desc.CreateUserResponse, error) {
-	id, err := s.usersRepository.CreateUser(ctx, req)
+	id, err := s.userService.CreateUser(ctx, converter.ToUserFromDesc(req))
 	if err != nil {
 		return nil, err
 	}
@@ -67,20 +70,22 @@ func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*
 }
 
 func (s *server) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.GetUserResponse, error) {
-	userObj, err := s.usersRepository.GetUser(ctx, req.GetId())
+	userObj, err := s.userService.GetUser(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println(color.BlueString("Get user by id: %d", userObj.Id))
+	log.Println(color.BlueString("Get user by id: %d", userObj.ID))
+
+	userObjConvert := converter.ToUserFromService(userObj)
 
 	return &desc.GetUserResponse{
-		Id:        userObj.Id,
+		Id:        userObjConvert.Id,
 		Name:      userObj.Name,
 		Email:     userObj.Email,
-		Role:      userObj.Role,
-		CreatedAt: userObj.CreatedAt,
-		UpdatedAt: userObj.UpdatedAt,
+		Role:      userObjConvert.Role,
+		CreatedAt: userObjConvert.CreatedAt,
+		UpdatedAt: userObjConvert.UpdatedAt,
 	}, nil
 
 }

@@ -7,7 +7,7 @@ import (
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
-func ToAuthToService(user *model.User) *desc.GetUserResponse {
+func ToUserFromService(user *model.User) *desc.GetUserResponse {
 	var updated_at *timestamppb.Timestamp
 	if user.UpdatedAt.Valid {
 		updated_at = timestamppb.New(user.UpdatedAt.Time)
@@ -20,5 +20,15 @@ func ToAuthToService(user *model.User) *desc.GetUserResponse {
 		Role:      desc.Role(user.Role),
 		CreatedAt: timestamppb.New(user.CreatedAt),
 		UpdatedAt: updated_at,
+	}
+}
+
+func ToUserFromDesc(user *desc.CreateUserRequest) *model.User {
+	return &model.User{
+		Name:            user.Name,
+		Email:           user.Email,
+		Password:        user.Password,
+		PasswordConfirm: user.PasswordConfirm,
+		Role:            int64(user.Role),
 	}
 }
