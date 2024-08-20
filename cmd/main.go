@@ -11,9 +11,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/Timofey335/auth/internal/converter"
+	userApi "github.com/Timofey335/auth/internal/api/user"
 	user "github.com/Timofey335/auth/internal/repository/user"
-	"github.com/Timofey335/auth/internal/service"
 	userService "github.com/Timofey335/auth/internal/service/user"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
@@ -22,11 +21,6 @@ const (
 	grpcPort = 50051
 	dbDSN    = "host=localhost port=54321 dbname=users user=user password=userspassword sslmode=disable"
 )
-
-type server struct {
-	desc.UnimplementedAuthV1Server
-	userService service.UserService
-}
 
 func main() {
 	ctx := context.Background()
@@ -47,47 +41,13 @@ func main() {
 
 	s := grpc.NewServer()
 	reflection.Register(s)
-	desc.RegisterAuthV1Server(s, &server{userService: userService})
+	desc.RegisterAuthV1Server(s, userApi.NewImplementation(userService))
 
 	log.Println(color.BlueString("server listening at %v", lis.Addr()))
 
 	if err := s.Serve(lis); err == nil {
 		log.Fatalf(color.RedString("failed to serve: %v", err))
 	}
-}
-
-func (s *server) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*desc.CreateUserResponse, error) {
-	id, err := s.userService.CreateUser(ctx, converter.ToUserFromDesc(req))
-	if err != nil {
-		return nil, err
-	}
-
-	log.Println(color.BlueString("create user: %v, with ctx: %v", req, ctx))
-
-	return &desc.CreateUserResponse{
-		Id: id,
-	}, nil
-}
-
-func (s *server) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.GetUserResponse, error) {
-	userObj, err := s.userService.GetUser(ctx, req.GetId())
-	if err != nil {
-		return nil, err
-	}
-
-	log.Println(color.BlueString("Get user by id: %d", userObj.ID))
-
-	userObjConvert := converter.ToUserFromService(userObj)
-
-	return &desc.GetUserResponse{
-		Id:        userObjConvert.Id,
-		Name:      userObj.Name,
-		Email:     userObj.Email,
-		Role:      userObjConvert.Role,
-		CreatedAt: userObjConvert.CreatedAt,
-		UpdatedAt: userObjConvert.UpdatedAt,
-	}, nil
-
 }
 
 // UpdateUser - update information of the user by id
