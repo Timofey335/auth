@@ -41,6 +41,7 @@ func NewRepository(db *pgxpool.Pool) repository.UserRepository {
 	return &repo{db: db}
 }
 
+// CreateUser - create a new user
 func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) {
 	err := validation.Validate(user.Name, validation.Required, validation.Length(2, 50))
 	if err != nil {
@@ -82,6 +83,7 @@ func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) 
 	return userId, nil
 }
 
+// GetUser - get information of the user by id
 func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
 	var user modelRepo.User
 
@@ -143,7 +145,7 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 		return nil, fmt.Errorf("updating failed")
 	}
 
-	log.Println(color.BlueString("updated the user %v, with ctx: %v", user, ctx))
+	log.Println(color.BlueString("updated the user %v, with ctx: %v", user.ID, ctx))
 
 	return &emptypb.Empty{}, nil
 }

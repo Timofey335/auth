@@ -34,11 +34,37 @@ func ToUserFromDesc(user *desc.CreateUserRequest) *model.User {
 }
 
 func ToUserFromDescUpd(user *desc.UpdateUserRequest) *model.User {
+	var name, password, passwordConfirm string
+	var role int64
+
+	if user.Name != nil {
+		name = user.Name.Value
+	}
+
+	if user.Password != nil {
+		password = user.Password.Value
+	}
+
+	if user.PasswordConfirm != nil {
+		passwordConfirm = user.PasswordConfirm.Value
+	}
+
+	if user.Role != nil {
+		switch *user.Role {
+		case 1:
+			role = 1
+		case 2:
+			role = 2
+		default:
+			role = 0
+		}
+	}
+
 	return &model.User{
 		ID:              user.Id,
-		Name:            user.Name.Value,
-		Password:        user.Password.Value,
-		PasswordConfirm: user.PasswordConfirm.Value,
-		Role:            int64(*user.Role),
+		Name:            name,
+		Password:        password,
+		PasswordConfirm: passwordConfirm,
+		Role:            role,
 	}
 }
