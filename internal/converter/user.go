@@ -32,3 +32,13 @@ func ToUserFromDesc(user *desc.CreateUserRequest) *model.User {
 		Role:            int64(user.Role),
 	}
 }
+
+func ToUserFromDescUpd(user *desc.UpdateUserRequest) *model.User {
+	return &model.User{
+		ID:              user.Id,
+		Name:            user.Name.Value,
+		Password:        user.Password.Value,
+		PasswordConfirm: user.PasswordConfirm.Value,
+		Role:            int64(*user.Role),
+	}
+}

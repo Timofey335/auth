@@ -10,8 +10,8 @@ import (
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
-func (s *Implementation) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*desc.CreateUserResponse, error) {
-	id, err := s.userService.CreateUser(ctx, converter.ToUserFromDesc(req))
+func (i *Implementation) CreateUser(ctx context.Context, req *desc.CreateUserRequest) (*desc.CreateUserResponse, error) {
+	id, err := i.userService.CreateUser(ctx, converter.ToUserFromDesc(req))
 	if err != nil {
 		return nil, err
 	}
