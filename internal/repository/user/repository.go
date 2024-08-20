@@ -149,3 +149,17 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 
 	return &emptypb.Empty{}, nil
 }
+
+// DeleteUser - delete a user by id
+func (r *repo) DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, error) {
+	var id int64
+	err := r.db.QueryRow(ctx, `DELETE FROM users WHERE id = $1 RETURNING id`, userId).Scan(&id)
+	if err != nil {
+		log.Println(color.HiMagentaString("error while deleting the user: %v, with ctx: %v", err, ctx))
+		return nil, err
+	}
+
+	log.Println(color.HiMagentaString("deleted the user: id %v, with ctx: %v", id, ctx))
+
+	return &emptypb.Empty{}, nil
+}
