@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/Timofey335/auth/internal/converter"
 	"github.com/fatih/color"
 
+	"github.com/Timofey335/auth/internal/converter"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 

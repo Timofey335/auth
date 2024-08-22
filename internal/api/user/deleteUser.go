@@ -3,8 +3,9 @@ package user
 import (
 	"context"
 
-	desc "github.com/Timofey335/auth/pkg/auth_v1"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
 func (i *Implementation) DeleteUser(ctx context.Context, req *desc.DeleteUserRequest) (*emptypb.Empty, error) {

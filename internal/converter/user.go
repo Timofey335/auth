@@ -1,9 +1,9 @@
 package converter
 
 import (
-	"github.com/Timofey335/auth/internal/model"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/Timofey335/auth/internal/model"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 

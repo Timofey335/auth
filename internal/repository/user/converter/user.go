@@ -2,7 +2,6 @@ package converter
 
 import (
 	"github.com/Timofey335/auth/internal/model"
-
 	modelRepo "github.com/Timofey335/auth/internal/repository/user/model"
 )
 

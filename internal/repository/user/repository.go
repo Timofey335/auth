@@ -7,18 +7,18 @@ import (
 	"log"
 	"time"
 
-	"github.com/Timofey335/auth/internal/model"
-	"github.com/Timofey335/auth/internal/repository/user/converter"
 	"github.com/fatih/color"
-	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/Timofey335/auth/internal/model"
 	repository "github.com/Timofey335/auth/internal/repository"
+	"github.com/Timofey335/auth/internal/repository/user/converter"
 	modelRepo "github.com/Timofey335/auth/internal/repository/user/model"
+	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 const (
