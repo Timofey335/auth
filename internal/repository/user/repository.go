@@ -1,4 +1,4 @@
-package users
+package user
 
 import (
 	"context"
@@ -19,18 +19,6 @@ import (
 	"github.com/Timofey335/auth/internal/repository/user/converter"
 	modelRepo "github.com/Timofey335/auth/internal/repository/user/model"
 	validation "github.com/go-ozzo/ozzo-validation"
-)
-
-const (
-	tableName = "users"
-
-	idColumn        = "id"
-	nameColumn      = "name"
-	emailColumn     = "email"
-	passwordColumn  = "password"
-	roleColumn      = "role"
-	createdAtColumn = "created_at"
-	updatedAtColumn = "updated_at"
 )
 
 type repo struct {
