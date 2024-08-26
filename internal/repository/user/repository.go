@@ -10,11 +10,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/color"
 	"github.com/go-ozzo/ozzo-validation/is"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/Timofey335/auth/internal/client/db"
 	"github.com/Timofey335/auth/internal/model"
 	repository "github.com/Timofey335/auth/internal/repository"
 	"github.com/Timofey335/auth/internal/repository/user/converter"
@@ -35,10 +35,10 @@ const (
 )
 
 type repo struct {
-	db *pgxpool.Pool
+	db db.Client
 }
 
-func NewRepository(db *pgxpool.Pool) repository.UserRepository {
+func NewRepository(db db.Client) repository.UserRepository {
 	return &repo{db: db}
 }
 
@@ -83,8 +83,13 @@ func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) 
 		log.Fatalf("failed to build query: %v", err)
 	}
 
+	q := db.Query{
+		Name:     "user_repository.CreateUser",
+		QueryRaw: query,
+	}
+
 	var userId int64
-	err = r.db.QueryRow(ctx, query, args...).Scan(&userId)
+	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&userId)
 	if err != nil {
 		return 0, err
 	}
@@ -96,19 +101,24 @@ func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) 
 
 // GetUser - get information of the user by id
 func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
-	var user modelRepo.User
 
 	builderSelect := sq.Select(idColumn, nameColumn, emailColumn, roleColumn, createdAtColumn, updatedAtColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
-		Where(sq.Eq{"id": userId})
+		Where(sq.Eq{idColumn: userId})
 
 	query, args, err := builderSelect.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	err = r.db.QueryRow(ctx, query, args...).Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+	q := db.Query{
+		Name:     "user_repository.GetUser",
+		QueryRaw: query,
+	}
+
+	var user modelRepo.User
+	err = r.db.DB().ScanOneContext(ctx, &user, q, args...)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -124,14 +134,19 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 	builderSelect := sq.Select(nameColumn, passwordColumn, roleColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
-		Where(sq.Eq{"id": user.ID})
+		Where(sq.Eq{idColumn: user.ID})
 
 	query, args, err := builderSelect.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	err = r.db.QueryRow(ctx, query, args...).Scan(&name, &password, &role)
+	qSel := db.Query{
+		Name:     "user_repository.SelectUser",
+		QueryRaw: query,
+	}
+
+	err = r.db.DB().QueryRowContext(ctx, qSel, args...).Scan(&name, &password, &role)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -173,14 +188,19 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 		Set(passwordColumn, password).
 		Set(roleColumn, role).
 		Set(updatedAtColumn, time.Now()).
-		Where(sq.Eq{"id": user.ID})
+		Where(sq.Eq{idColumn: user.ID})
 
 	query, args, err = builderUpdate.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := r.db.Exec(ctx, query, args...)
+	q := db.Query{
+		Name:     "user_repository.UpdateUser",
+		QueryRaw: query,
+	}
+
+	res, err := r.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +221,7 @@ func (r *repo) DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, er
 
 	builderDelete := sq.Delete(tableName).
 		PlaceholderFormat(sq.Dollar).
-		Where(sq.Eq{"id": userId}).
+		Where(sq.Eq{idColumn: userId}).
 		Suffix("RETURNING id")
 
 	query, args, err := builderDelete.ToSql()
@@ -209,7 +229,12 @@ func (r *repo) DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, er
 		return nil, err
 	}
 
-	err = r.db.QueryRow(ctx, query, args...).Scan(&id)
+	q := db.Query{
+		Name:     "user_repository.DeleteUser",
+		QueryRaw: query,
+	}
+
+	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id)
 	if err != nil {
 		log.Println(color.HiMagentaString("error while deleting the user: %v, with ctx: %v", err, ctx))
 		return nil, err
