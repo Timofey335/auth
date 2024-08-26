@@ -22,6 +22,18 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
+const (
+	tableName = "users"
+
+	idColumn        = "id"
+	nameColumn      = "name"
+	emailColumn     = "email"
+	passwordColumn  = "password"
+	roleColumn      = "role"
+	createdAtColumn = "created_at"
+	updatedAtColumn = "updated_at"
+)
+
 type repo struct {
 	db *pgxpool.Pool
 }
@@ -60,9 +72,9 @@ func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) 
 		return 0, err
 	}
 
-	builderInsert := sq.Insert("users").
+	builderInsert := sq.Insert(tableName).
 		PlaceholderFormat(sq.Dollar).
-		Columns("name", "email", "password", "role", "created_at").
+		Columns(nameColumn, emailColumn, passwordColumn, roleColumn, createdAtColumn).
 		Values(user.Name, user.Email, user.Password, user.Role, time.Now()).
 		Suffix("RETURNING id")
 
@@ -86,8 +98,8 @@ func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) 
 func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
 	var user modelRepo.User
 
-	builderSelect := sq.Select("id", "name", "email", "role", "created_at", "updated_at").
-		From("users").
+	builderSelect := sq.Select(idColumn, nameColumn, emailColumn, roleColumn, createdAtColumn, updatedAtColumn).
+		From(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{"id": userId})
 
@@ -109,8 +121,8 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 	var name, password string
 	var role int64
 
-	builderSelect := sq.Select("name", "password", "role").
-		From("users").
+	builderSelect := sq.Select(nameColumn, passwordColumn, roleColumn).
+		From(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{"id": user.ID})
 
@@ -155,12 +167,12 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 		role = user.Role
 	}
 
-	builderUpdate := sq.Update("users").
+	builderUpdate := sq.Update(tableName).
 		PlaceholderFormat(sq.Dollar).
-		Set("name", name).
-		Set("password", password).
-		Set("role", role).
-		Set("updated_at", time.Now()).
+		Set(nameColumn, name).
+		Set(passwordColumn, password).
+		Set(roleColumn, role).
+		Set(updatedAtColumn, time.Now()).
 		Where(sq.Eq{"id": user.ID})
 
 	query, args, err = builderUpdate.ToSql()
@@ -187,7 +199,7 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 func (r *repo) DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, error) {
 	var id int64
 
-	builderDelete := sq.Delete("users").
+	builderDelete := sq.Delete(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{"id": userId}).
 		Suffix("RETURNING id")
