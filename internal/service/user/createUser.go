@@ -7,7 +7,22 @@ import (
 )
 
 func (s *serv) CreateUser(ctx context.Context, user *model.User) (int64, error) {
-	id, err := s.userRepository.CreateUser(ctx, user)
+	var id int64
+	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
+		var errTx error
+		id, errTx = s.userRepository.CreateUser(ctx, user)
+		if errTx != nil {
+			return errTx
+		}
+
+		_, errTx = s.userRepository.GetUser(ctx, id)
+		if errTx != nil {
+			return errTx
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}

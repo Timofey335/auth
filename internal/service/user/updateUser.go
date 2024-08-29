@@ -9,7 +9,21 @@ import (
 )
 
 func (s *serv) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty, error) {
-	_, err := s.userRepository.UpdateUser(ctx, user)
+	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
+		var errTx error
+		_, errTx = s.userRepository.UpdateUser(ctx, user)
+		if errTx != nil {
+			return errTx
+		}
+
+		_, errTx = s.userRepository.GetUser(ctx, user.ID)
+		if errTx != nil {
+			return errTx
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}

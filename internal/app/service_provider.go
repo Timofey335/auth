@@ -7,6 +7,7 @@ import (
 	"github.com/Timofey335/auth/internal/api/user"
 	"github.com/Timofey335/auth/internal/client/db"
 	"github.com/Timofey335/auth/internal/client/db/pg"
+	"github.com/Timofey335/auth/internal/client/db/transaction"
 	"github.com/Timofey335/auth/internal/closer"
 	"github.com/Timofey335/auth/internal/config"
 	"github.com/Timofey335/auth/internal/config/env"
@@ -20,8 +21,8 @@ type serviceProvider struct {
 	pgConfig   config.PGConfig
 	grpcConfig config.GRPCConfig
 
-	// pgPool         *pgxpool.Pool
 	dbClient       db.Client
+	txManager      db.TxManager
 	userRepository repository.UserRepository
 
 	userService service.UserService
@@ -79,27 +80,13 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 
 }
 
-// func (s *serviceProvider) PgPool(ctx context.Context) *pgxpool.Pool {
-// 	if s.pgPool == nil {
-// 		pool, err := pgxpool.Connect(ctx, s.PGConfig().DSN())
-// 		if err != nil {
-// 			log.Fatalf("failed to connect to database: %v", err)
-// 		}
+func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
+	if s.txManager == nil {
+		s.txManager = transaction.NewTransactionManager(s.DBClient(ctx).DB())
+	}
 
-// 		if err = pool.Ping(ctx); err != nil {
-// 			log.Fatalf("ping error: %s", err.Error())
-// 		}
-
-// 		closer.Add(func() error {
-// 			pool.Close()
-// 			return nil
-// 		})
-
-// 		s.pgPool = pool
-// 	}
-
-// 	return s.pgPool
-// }
+	return s.txManager
+}
 
 func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRepository {
 	if s.userRepository == nil {
@@ -111,7 +98,10 @@ func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRep
 
 func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
-		s.userService = userService.NewService(s.UserRepository(ctx))
+		s.userService = userService.NewService(
+			s.UserRepository(ctx),
+			s.TxManager(ctx),
+		)
 	}
 
 	return s.userService
