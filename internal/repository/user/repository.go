@@ -9,6 +9,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/color"
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -19,7 +20,6 @@ import (
 	repository "github.com/Timofey335/auth/internal/repository"
 	"github.com/Timofey335/auth/internal/repository/user/converter"
 	modelRepo "github.com/Timofey335/auth/internal/repository/user/model"
-	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 const (
@@ -42,7 +42,7 @@ func NewRepository(db db.Client) repository.UserRepository {
 	return &repo{db: db}
 }
 
-// CreateUser - create a new user
+// CreateUser - создает нового пользователя
 func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) {
 	err := validation.Validate(user.Name, validation.Required, validation.Length(2, 50))
 	if err != nil {
@@ -99,9 +99,8 @@ func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) 
 	return userId, nil
 }
 
-// GetUser - get information of the user by id
+// GetUser - получает данные пользователя
 func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
-
 	builderSelect := sq.Select(idColumn, nameColumn, emailColumn, roleColumn, createdAtColumn, updatedAtColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
@@ -126,7 +125,7 @@ func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
 	return converter.ToUserFromRepo(&user), nil
 }
 
-// UpdateUser - update information of the user by id
+// UpdateUser - обновляет данные пользователя
 func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty, error) {
 	var name, password string
 	var role int64
@@ -215,7 +214,7 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 	return &emptypb.Empty{}, nil
 }
 
-// DeleteUser - delete a user by id
+// DeleteUser - удаляет пользователя
 func (r *repo) DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, error) {
 	var id int64
 

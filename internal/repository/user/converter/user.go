@@ -5,6 +5,7 @@ import (
 	modelRepo "github.com/Timofey335/auth/internal/repository/user/model"
 )
 
+// ToUserFromRepo - конвертирует данные из repo слоя в сервисный слой
 func ToUserFromRepo(user *modelRepo.User) *model.User {
 	return &model.User{
 		ID:        user.ID,

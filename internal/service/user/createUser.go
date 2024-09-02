@@ -6,6 +6,7 @@ import (
 	"github.com/Timofey335/auth/internal/model"
 )
 
+// CreateUser - создает нового пользователя
 func (s *serv) CreateUser(ctx context.Context, user *model.User) (int64, error) {
 	var id int64
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {

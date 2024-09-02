@@ -20,6 +20,8 @@ type grpcConfig struct {
 	port string
 }
 
+// NewGRPCConfig - создает новый объект grpcConfig,
+// считывает значения host и port из env файла
 func NewGRPCConfig() (*grpcConfig, error) {
 	host := os.Getenv(grpcHostEnvName)
 	if len(host) == 0 {
@@ -37,6 +39,7 @@ func NewGRPCConfig() (*grpcConfig, error) {
 	}, nil
 }
 
+// Address - конкатенирует значения host и port в одну строку
 func (cfg *grpcConfig) Address() string {
 	return net.JoinHostPort(cfg.host, cfg.port)
 }

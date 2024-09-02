@@ -8,6 +8,7 @@ import (
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
+// UpdateUser - обновляет данные пользователя
 func (i *Implementation) UpdateUser(ctx context.Context, req *desc.UpdateUserRequest) (*emptypb.Empty, error) {
 	_, err := i.userService.UpdateUser(ctx, converter.ToUserFromDescUpd(req))
 	if err != nil {

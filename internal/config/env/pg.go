@@ -17,6 +17,7 @@ type pgConfig struct {
 	dsn string
 }
 
+// NewPGConfig - считывает значение DSN из env файла
 func NewPGConfig() (*pgConfig, error) {
 	dsn := os.Getenv(dsnEnvName)
 	if len(dsn) == 0 {
@@ -28,6 +29,7 @@ func NewPGConfig() (*pgConfig, error) {
 	}, nil
 }
 
+// DSN - возвращает из объекта pgConfig DSN для Postgres
 func (cfg *pgConfig) DSN() string {
 	return cfg.dsn
 }

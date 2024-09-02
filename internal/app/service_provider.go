@@ -34,6 +34,7 @@ func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
 }
 
+// PGConfig - инициализирует конфигурацию БД из env файла
 func (s *serviceProvider) PGConfig() config.PGConfig {
 	if s.pgConfig == nil {
 		cfg, err := env.NewPGConfig()
@@ -47,6 +48,7 @@ func (s *serviceProvider) PGConfig() config.PGConfig {
 	return s.pgConfig
 }
 
+// GRPCConfig - инициализирует конфигурацию GRPC сервера
 func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 	if s.grpcConfig == nil {
 		cfg, err := env.NewGRPCConfig()
@@ -60,6 +62,7 @@ func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 	return s.grpcConfig
 }
 
+// DBClient - инициализирует подключение к БД
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
 		cl, err := pg.New(ctx, s.PGConfig().DSN())
@@ -77,9 +80,9 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	}
 
 	return s.dbClient
-
 }
 
+// TxManager - инициализирует Transaction Manager
 func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	if s.txManager == nil {
 		s.txManager = transaction.NewTransactionManager(s.DBClient(ctx).DB())
@@ -88,6 +91,7 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	return s.txManager
 }
 
+// UserRepository - инициализация repo слоя
 func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRepository {
 	if s.userRepository == nil {
 		s.userRepository = userRepository.NewRepository(s.DBClient(ctx))
@@ -96,6 +100,7 @@ func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRep
 	return s.userRepository
 }
 
+// UserService - инициализация сервисного слоя
 func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
 		s.userService = userService.NewService(
@@ -107,6 +112,7 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	return s.userService
 }
 
+// ServImplementation - инициализация api слоя
 func (s *serviceProvider) ServImplementation(ctx context.Context) *user.Implementation {
 	if s.servImplementation == nil {
 		s.servImplementation = user.NewImplementation(s.UserService(ctx))

@@ -8,6 +8,7 @@ import (
 	"github.com/Timofey335/auth/internal/model"
 )
 
+// UpdateUser - обновляет данные пользователя
 func (s *serv) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty, error) {
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
 		var errTx error

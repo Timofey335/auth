@@ -10,6 +10,7 @@ import (
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
+// GetUser - получает данные о пользователе
 func (i *Implementation) GetUser(ctx context.Context, req *desc.GetUserRequest) (*desc.GetUserResponse, error) {
 	userObj, err := i.userService.GetUser(ctx, req.GetId())
 	if err != nil {

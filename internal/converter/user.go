@@ -7,6 +7,7 @@ import (
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
+// ToUserFromService - конвертирует данные из сервисного слоя для desc (GRPC)
 func ToUserFromService(user *model.User) *desc.GetUserResponse {
 	var updated_at *timestamppb.Timestamp
 	if user.UpdatedAt.Valid {
@@ -23,6 +24,7 @@ func ToUserFromService(user *model.User) *desc.GetUserResponse {
 	}
 }
 
+// ToUserFromDesc - конвертирует данные из desc (GRPC) для сервисного слоя
 func ToUserFromDesc(user *desc.CreateUserRequest) *model.User {
 	return &model.User{
 		Name:            user.Name,
@@ -33,6 +35,7 @@ func ToUserFromDesc(user *desc.CreateUserRequest) *model.User {
 	}
 }
 
+// ToUserFromDescUpd - конвертирует данные из desc (GRPC) для сервисного слоя
 func ToUserFromDescUpd(user *desc.UpdateUserRequest) *model.User {
 	var name, password, passwordConfirm string
 	var role int64

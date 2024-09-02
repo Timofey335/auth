@@ -9,18 +9,22 @@ import (
 
 var globalCloser = New()
 
+// Add - добавляет `func() error` в globalCloser
 func Add(f ...func() error) {
 	globalCloser.Add(f...)
 }
 
+// Wait ...
 func Wait() {
 	globalCloser.Wait()
 }
 
+// CloseAll ...
 func CloseAll() {
 	globalCloser.CloseAll()
 }
 
+// Closer ...
 type Closer struct {
 	mu    sync.Mutex
 	once  sync.Once
@@ -28,6 +32,7 @@ type Closer struct {
 	funcs []func() error
 }
 
+// New - возвращает Closer, если из ОС придет сигнал, то Closer вызовет CloseAll
 func New(sig ...os.Signal) *Closer {
 	c := &Closer{done: make(chan struct{})}
 	if len(sig) > 0 {
@@ -43,16 +48,19 @@ func New(sig ...os.Signal) *Closer {
 	return c
 }
 
+// Add - метод объекта Closer, добавляет в объект функцию
 func (c *Closer) Add(f ...func() error) {
 	c.mu.Lock()
 	c.funcs = append(c.funcs, f...)
 	c.mu.Unlock()
 }
 
+// Wait - ожидает, пока не поступит сигнал в канал done
 func (c *Closer) Wait() {
 	<-c.done
 }
 
+// CloseAll - вызывает все функции закрытия из объекта Closer
 func (c *Closer) CloseAll() {
 	c.once.Do(func() {
 		defer close(c.done)

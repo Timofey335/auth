@@ -13,6 +13,7 @@ type pgClient struct {
 	masterDBC db.DB
 }
 
+// New - создает новый клиент к БД
 func New(ctx context.Context, dsn string) (db.Client, error) {
 	dbc, err := pgxpool.Connect(ctx, dsn)
 	if err != nil {
@@ -24,10 +25,13 @@ func New(ctx context.Context, dsn string) (db.Client, error) {
 	}, nil
 }
 
+// DB - создает соединение с БД, сделан для расширение возможностей,
+// если необходимо будет добавить подключение к другой или нескольким БД
 func (p *pgClient) DB() db.DB {
 	return p.masterDBC
 }
 
+// Close - закрывает соединение с БД
 func (p *pgClient) Close() error {
 	if p.masterDBC != nil {
 		p.masterDBC.Close()
