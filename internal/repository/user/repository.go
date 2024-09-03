@@ -2,15 +2,12 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/color"
-	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -44,34 +41,6 @@ func NewRepository(db db.Client) repository.UserRepository {
 
 // CreateUser - создает нового пользователя
 func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) {
-	err := validation.Validate(user.Name, validation.Required, validation.Length(2, 50))
-	if err != nil {
-		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
-
-		return 0, err
-	}
-
-	err = validation.Validate(user.Email, validation.Required, is.Email)
-	if err != nil {
-		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
-
-		return 0, err
-	}
-
-	if user.Password != user.PasswordConfirm {
-		err := errors.New("password doesn't match")
-		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
-
-		return 0, err
-	}
-
-	err = validation.Validate(user.Password, validation.Required, validation.Length(8, 50))
-	if err != nil {
-		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
-
-		return 0, err
-	}
-
 	builderInsert := sq.Insert(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Columns(nameColumn, emailColumn, passwordColumn, roleColumn, createdAtColumn).
@@ -93,8 +62,6 @@ func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) 
 	if err != nil {
 		return 0, err
 	}
-
-	log.Println(color.BlueString("create user: %v, with ctx: %v", user, ctx))
 
 	return userId, nil
 }
@@ -125,7 +92,7 @@ func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
 	return converter.ToUserFromRepo(&user), nil
 }
 
-// UpdateUser - обновляет данные пользователя
+// UpdateUser - update information of the user by id
 func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty, error) {
 	var name, password string
 	var role int64
@@ -152,29 +119,10 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 
 	if user.Name != "" {
 		name = user.Name
-		err := validation.Validate(name, validation.Required, validation.Length(2, 50))
-		if err != nil {
-			log.Println(color.HiMagentaString("error while updating the user with id '%v'; %v", user.ID, err))
-
-			return nil, err
-		}
 	}
 
 	if user.Password != "" {
 		password = user.Password
-		if password != user.PasswordConfirm {
-			err := errors.New("password doesn't match")
-			log.Println(color.HiMagentaString("error while updating password the user with id '%v; %v'", user.ID, err))
-
-			return nil, err
-		}
-
-		err := validation.Validate(&password, validation.Required, validation.Length(8, 50))
-		if err != nil {
-			log.Println(color.HiMagentaString("error while updating password the user with id '%v'; %v", user.ID, err))
-
-			return nil, err
-		}
 	}
 
 	if user.Role != 0 {
