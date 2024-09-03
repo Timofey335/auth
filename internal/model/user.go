@@ -14,5 +14,5 @@ type User struct {
 	PasswordConfirm string
 	Role            int64
 	CreatedAt       time.Time
-	UpdatedAt       sql.NullTime
+	UpdatedAt       *sql.NullTime
 }

@@ -14,6 +14,6 @@ func ToUserFromRepo(user *modelRepo.User) *model.User {
 		Password:  user.Password,
 		Role:      user.Role,
 		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
+		UpdatedAt: &user.UpdatedAt,
 	}
 }
