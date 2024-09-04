@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -14,7 +13,7 @@ type UserModel struct {
 	PasswordConfirm string
 	Role            int64
 	CreatedAt       time.Time
-	UpdatedAt       *sql.NullTime
+	UpdatedAt       time.Time
 }
 
 // UserUpdateModel - модель для метода Update

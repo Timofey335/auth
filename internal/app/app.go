@@ -23,7 +23,6 @@ type App struct {
 
 // NewApp - создает объект структуры App и вызывает функцию initDeps
 func NewApp(ctx context.Context, cfg string) (*App, error) {
-
 	a := &App{}
 
 	if err := a.initDeps(ctx, cfg); err != nil {

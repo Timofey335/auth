@@ -9,9 +9,9 @@ import (
 
 // ToUserFromService - конвертирует данные из сервисного слоя для desc (GRPC)
 func ToUserFromService(user *model.UserModel) *desc.GetUserResponse {
-	var updated_at *timestamppb.Timestamp
-	if user.UpdatedAt.Valid {
-		updated_at = timestamppb.New(user.UpdatedAt.Time)
+	var updatedAt *timestamppb.Timestamp
+	if !user.UpdatedAt.IsZero() {
+		updatedAt = timestamppb.New(user.UpdatedAt)
 	}
 
 	return &desc.GetUserResponse{
@@ -20,7 +20,7 @@ func ToUserFromService(user *model.UserModel) *desc.GetUserResponse {
 		Email:     user.Email,
 		Role:      desc.Role(user.Role),
 		CreatedAt: timestamppb.New(user.CreatedAt),
-		UpdatedAt: updated_at,
+		UpdatedAt: updatedAt,
 	}
 }
 
