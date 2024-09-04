@@ -7,7 +7,7 @@ import (
 )
 
 // GetUser - получает данные о пользователе
-func (s *serv) GetUser(ctx context.Context, id int64) (*model.User, error) {
+func (s *serv) GetUser(ctx context.Context, id int64) (*model.UserModel, error) {
 	user, err := s.userRepository.GetUser(ctx, id)
 	if err != nil {
 		return nil, err

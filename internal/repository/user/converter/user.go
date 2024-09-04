@@ -6,8 +6,8 @@ import (
 )
 
 // ToUserFromRepo - конвертирует данные из repo слоя в сервисный слой
-func ToUserFromRepo(user *modelRepo.User) *model.User {
-	return &model.User{
+func ToUserFromRepo(user *modelRepo.UserRepoModel) *model.UserModel {
+	return &model.UserModel{
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,

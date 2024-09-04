@@ -6,7 +6,7 @@ import (
 )
 
 // User - модель User
-type User struct {
+type UserModel struct {
 	ID              int64
 	Name            string
 	Email           string
@@ -15,4 +15,13 @@ type User struct {
 	Role            int64
 	CreatedAt       time.Time
 	UpdatedAt       *sql.NullTime
+}
+
+// UserUpdateModel - модель для метода Update
+type UserUpdateModel struct {
+	ID              int64
+	Name            *string
+	Password        *string
+	PasswordConfirm *string
+	Role            *int64
 }

@@ -13,9 +13,9 @@ import (
 )
 
 // UpdateUser - обновляет данные пользователя
-func (s *serv) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty, error) {
-	if user.Name != "" {
-		err := validation.Validate(user.Name, validation.Required, validation.Length(2, 50))
+func (s *serv) UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*emptypb.Empty, error) {
+	if *user.Name != "" {
+		err := validation.Validate(*user.Name, validation.Required, validation.Length(2, 50))
 		if err != nil {
 			log.Println(color.HiMagentaString("error while updating the user with id '%v'; %v", user.ID, err))
 
@@ -23,15 +23,15 @@ func (s *serv) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 		}
 	}
 
-	if user.Password != "" {
-		if user.Password != user.PasswordConfirm {
+	if *user.Password != "" {
+		if *user.Password != *user.PasswordConfirm {
 			err := errors.New("password doesn't match")
 			log.Println(color.HiMagentaString("error while updating the new user: %v, with ctx: %v", err, ctx))
 
 			return nil, err
 		}
 
-		err := validation.Validate(user.Password, validation.Required, validation.Length(8, 50))
+		err := validation.Validate(*user.Password, validation.Required, validation.Length(8, 50))
 		if err != nil {
 			log.Println(color.HiMagentaString("error while updating the new user: %v, with ctx: %v", err, ctx))
 

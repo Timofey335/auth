@@ -35,12 +35,13 @@ type repo struct {
 	db db.Client
 }
 
+// NewRepository - создает новый объект repo
 func NewRepository(db db.Client) repository.UserRepository {
 	return &repo{db: db}
 }
 
 // CreateUser - создает нового пользователя
-func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) {
+func (r *repo) CreateUser(ctx context.Context, user *model.UserModel) (int64, error) {
 	builderInsert := sq.Insert(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Columns(nameColumn, emailColumn, passwordColumn, roleColumn, createdAtColumn).
@@ -67,7 +68,7 @@ func (r *repo) CreateUser(ctx context.Context, user *model.User) (int64, error) 
 }
 
 // GetUser - получает данные пользователя
-func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
+func (r *repo) GetUser(ctx context.Context, userId int64) (*model.UserModel, error) {
 	builderSelect := sq.Select(idColumn, nameColumn, emailColumn, roleColumn, createdAtColumn, updatedAtColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
@@ -83,7 +84,7 @@ func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
 		QueryRaw: query,
 	}
 
-	var user modelRepo.User
+	var user modelRepo.UserRepoModel
 	err = r.db.DB().ScanOneContext(ctx, &user, q, args...)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -93,7 +94,7 @@ func (r *repo) GetUser(ctx context.Context, userId int64) (*model.User, error) {
 }
 
 // UpdateUser - update information of the user by id
-func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty, error) {
+func (r *repo) UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*emptypb.Empty, error) {
 	var name, password string
 	var role int64
 
@@ -117,16 +118,16 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if user.Name != "" {
-		name = user.Name
+	if *user.Name != name && *user.Name != "" {
+		name = *user.Name
 	}
 
-	if user.Password != "" {
-		password = user.Password
+	if *user.Password != password && *user.Password != "" {
+		password = *user.Password
 	}
 
-	if user.Role != 0 {
-		role = user.Role
+	if *user.Role != 0 {
+		role = *user.Role
 	}
 
 	builderUpdate := sq.Update(tableName).

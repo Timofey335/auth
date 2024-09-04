@@ -8,7 +8,7 @@ import (
 )
 
 // ToUserFromService - конвертирует данные из сервисного слоя для desc (GRPC)
-func ToUserFromService(user *model.User) *desc.GetUserResponse {
+func ToUserFromService(user *model.UserModel) *desc.GetUserResponse {
 	var updated_at *timestamppb.Timestamp
 	if user.UpdatedAt.Valid {
 		updated_at = timestamppb.New(user.UpdatedAt.Time)
@@ -25,8 +25,8 @@ func ToUserFromService(user *model.User) *desc.GetUserResponse {
 }
 
 // ToUserFromDesc - конвертирует данные из desc (GRPC) для сервисного слоя
-func ToUserFromDesc(user *desc.CreateUserRequest) *model.User {
-	return &model.User{
+func ToUserFromDesc(user *desc.CreateUserRequest) *model.UserModel {
+	return &model.UserModel{
 		Name:            user.Name,
 		Email:           user.Email,
 		Password:        user.Password,
@@ -36,7 +36,7 @@ func ToUserFromDesc(user *desc.CreateUserRequest) *model.User {
 }
 
 // ToUserFromDescUpd - конвертирует данные из desc (GRPC) для сервисного слоя
-func ToUserFromDescUpd(user *desc.UpdateUserRequest) *model.User {
+func ToUserFromDescUpd(user *desc.UpdateUserRequest) *model.UserUpdateModel {
 	var name, password, passwordConfirm string
 	var role int64
 
@@ -63,11 +63,11 @@ func ToUserFromDescUpd(user *desc.UpdateUserRequest) *model.User {
 		}
 	}
 
-	return &model.User{
+	return &model.UserUpdateModel{
 		ID:              user.Id,
-		Name:            name,
-		Password:        password,
-		PasswordConfirm: passwordConfirm,
-		Role:            role,
+		Name:            &name,
+		Password:        &password,
+		PasswordConfirm: &passwordConfirm,
+		Role:            &role,
 	}
 }

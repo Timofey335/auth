@@ -13,7 +13,7 @@ import (
 )
 
 // CreateUser - создает нового пользователя
-func (s *serv) CreateUser(ctx context.Context, user *model.User) (int64, error) {
+func (s *serv) CreateUser(ctx context.Context, user *model.UserModel) (int64, error) {
 	err := validation.Validate(user.Name, validation.Required, validation.Length(2, 50))
 	if err != nil {
 		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))

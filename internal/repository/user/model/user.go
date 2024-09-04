@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// User - модель User
-type User struct {
+// UserRepoModel - модель User
+type UserRepoModel struct {
 	ID        int64        `db:"id"`
 	Name      string       `db:"name"`
 	Email     string       `db:"email"`

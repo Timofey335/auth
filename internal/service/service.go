@@ -10,8 +10,8 @@ import (
 
 // UserService - интерфейс сервисного слоя
 type UserService interface {
-	CreateUser(ctx context.Context, user *model.User) (int64, error)
-	GetUser(ctx context.Context, userId int64) (*model.User, error)
-	UpdateUser(ctx context.Context, user *model.User) (*emptypb.Empty, error)
+	CreateUser(ctx context.Context, user *model.UserModel) (int64, error)
+	GetUser(ctx context.Context, userId int64) (*model.UserModel, error)
+	UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*emptypb.Empty, error)
 	DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, error)
 }
