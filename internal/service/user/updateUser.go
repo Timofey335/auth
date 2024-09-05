@@ -47,11 +47,6 @@ func (s *serv) UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*em
 			return errTx
 		}
 
-		_, errTx = s.userRepository.GetUser(ctx, user.ID)
-		if errTx != nil {
-			return errTx
-		}
-
 		return nil
 	})
 

@@ -50,11 +50,6 @@ func (s *serv) CreateUser(ctx context.Context, user *model.UserModel) (int64, er
 			return errTx
 		}
 
-		_, errTx = s.userRepository.GetUser(ctx, id)
-		if errTx != nil {
-			return errTx
-		}
-
 		return nil
 	})
 
