@@ -9,6 +9,8 @@ import (
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Timofey335/auth/internal/cache"
+	cacheMocks "github.com/Timofey335/auth/internal/cache/mocks"
 	"github.com/Timofey335/auth/internal/client/db"
 	dbMocks "github.com/Timofey335/auth/internal/client/db/mocks"
 	"github.com/Timofey335/auth/internal/model"
@@ -19,6 +21,7 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	type userRepositoryMockFunc func(mc *minimock.Controller) repository.UserRepository
+	type userCacheMockFunc func(mc *minimock.Controller) cache.UserCache
 	type txManagerMockFunc func(mc *minimock.Controller) db.TxManager
 
 	type args struct {
@@ -55,6 +58,7 @@ func TestCreateUser(t *testing.T) {
 		want               int64
 		err                error
 		userRepositoryMock userRepositoryMockFunc
+		userCacheMock      userCacheMockFunc
 		txManagerMock      txManagerMockFunc
 	}{
 		{
@@ -68,6 +72,11 @@ func TestCreateUser(t *testing.T) {
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repoMocks.NewUserRepositoryMock(mc)
 				mock.CreateUserMock.Expect(ctx, req).Return(id, nil)
+				return mock
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				// mock.CreateUserMock.Expect(ctx, req).Return(nil)
 				return mock
 			},
 			txManagerMock: func(mc *minimock.Controller) db.TxManager {
@@ -91,6 +100,11 @@ func TestCreateUser(t *testing.T) {
 				mock.CreateUserMock.Expect(ctx, req).Return(0, serviceErr)
 				return mock
 			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				// mock.CreateUserMock.Expect(ctx, req).Return(serviceErr)
+				return mock
+			},
 			txManagerMock: func(mc *minimock.Controller) db.TxManager {
 				mock := dbMocks.NewTxManagerMock(mc)
 				mock.ReadCommittedMock.Set(func(ctx context.Context, f db.Handler) (err error) {
@@ -106,8 +120,10 @@ func TestCreateUser(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			userRepoMock := tt.userRepositoryMock(mc)
+			userCacheMock := tt.userCacheMock(mc)
 			txManagerMock := tt.txManagerMock(mc)
-			service := user.NewService(userRepoMock, txManagerMock)
+
+			service := user.NewMockService(userRepoMock, userCacheMock, txManagerMock)
 
 			resHandler, err := service.CreateUser(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)

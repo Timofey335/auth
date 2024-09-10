@@ -1,12 +1,22 @@
 package config
 
 import (
+	"time"
+
 	"github.com/joho/godotenv"
 )
 
 // GRPCConfig - интерфейс с методом Address
 type GRPCConfig interface {
 	Address() string
+}
+
+// RedisConfig - интерфейс конфигурации redis
+type RedisConfig interface {
+	Address() string
+	ConnectionTimeout() time.Duration
+	MaxIdle() int
+	IdleTimeout() time.Duration
 }
 
 // PGConfig - интерфейс с методом DSN

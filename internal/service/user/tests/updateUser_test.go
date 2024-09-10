@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/Timofey335/auth/internal/cache"
+	cacheMocks "github.com/Timofey335/auth/internal/cache/mocks"
 	"github.com/Timofey335/auth/internal/client/db"
 	dbMocks "github.com/Timofey335/auth/internal/client/db/mocks"
 	"github.com/Timofey335/auth/internal/model"
@@ -20,6 +22,7 @@ import (
 
 func TestUpdateUser(t *testing.T) {
 	type userRepositoryMockFunc func(mc *minimock.Controller) repository.UserRepository
+	type userCacheMockFunc func(mc *minimock.Controller) cache.UserCache
 	type txManagerMockFunc func(mc *minimock.Controller) db.TxManager
 
 	type args struct {
@@ -57,6 +60,7 @@ func TestUpdateUser(t *testing.T) {
 		want               *emptypb.Empty
 		err                error
 		userRepositoryMock userRepositoryMockFunc
+		userCacheMock      userCacheMockFunc
 		txManagaerMock     txManagerMockFunc
 	}{
 		{
@@ -70,6 +74,11 @@ func TestUpdateUser(t *testing.T) {
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repoMocks.NewUserRepositoryMock(mc)
 				mock.UpdateUserMock.Expect(ctx, req).Return(res, nil)
+				return mock
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				// mock.CreateUserMock.Expect(ctx, req).Return(nil)
 				return mock
 			},
 			txManagaerMock: func(mc *minimock.Controller) db.TxManager {
@@ -93,6 +102,11 @@ func TestUpdateUser(t *testing.T) {
 				mock.UpdateUserMock.Expect(ctx, req).Return(nil, serviceErr)
 				return mock
 			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				// mock.CreateUserMock.Expect(ctx, req).Return(nil)
+				return mock
+			},
 			txManagaerMock: func(mc *minimock.Controller) db.TxManager {
 				mock := dbMocks.NewTxManagerMock(mc)
 				mock.ReadCommittedMock.Set(func(ctx context.Context, f db.Handler) (err error) {
@@ -108,8 +122,9 @@ func TestUpdateUser(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			userRepoMock := tt.userRepositoryMock(mc)
+			userCacheMock := tt.userCacheMock(mc)
 			txManagerMock := tt.txManagaerMock(mc)
-			service := user.NewService(userRepoMock, txManagerMock)
+			service := user.NewService(userRepoMock, userCacheMock, txManagerMock)
 
 			resHandler, err := service.UpdateUser(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)
