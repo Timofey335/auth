@@ -1,8 +1,9 @@
 package user
 
 import (
+	"github.com/Timofey335/platform_common/pkg/db"
+
 	"github.com/Timofey335/auth/internal/cache"
-	"github.com/Timofey335/auth/internal/client/db"
 	"github.com/Timofey335/auth/internal/repository"
 	"github.com/Timofey335/auth/internal/service"
 	def "github.com/Timofey335/auth/internal/service"

@@ -4,10 +4,10 @@ import (
 	"context"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/Timofey335/platform_common/pkg/db"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/Timofey335/auth/internal/client/db"
 	"github.com/Timofey335/auth/internal/model"
 	"github.com/Timofey335/auth/internal/repository/user/converter"
 	modelRepo "github.com/Timofey335/auth/internal/repository/user/model"

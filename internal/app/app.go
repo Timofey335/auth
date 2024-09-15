@@ -5,12 +5,12 @@ import (
 	"log"
 	"net"
 
+	"github.com/Timofey335/platform_common/pkg/closer"
 	"github.com/fatih/color"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/Timofey335/auth/internal/closer"
 	"github.com/Timofey335/auth/internal/config"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )

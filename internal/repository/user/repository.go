@@ -1,7 +1,8 @@
 package user
 
 import (
-	"github.com/Timofey335/auth/internal/client/db"
+	"github.com/Timofey335/platform_common/pkg/db"
+
 	repository "github.com/Timofey335/auth/internal/repository"
 )
 

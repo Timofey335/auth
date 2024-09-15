@@ -6,8 +6,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/Timofey335/platform_common/pkg/db"
 
-	"github.com/Timofey335/auth/internal/client/db"
 	"github.com/Timofey335/auth/internal/model"
 )
 

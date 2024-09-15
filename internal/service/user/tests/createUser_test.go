@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Timofey335/platform_common/pkg/db"
+	dbMocks "github.com/Timofey335/platform_common/pkg/db/mocks"
 	"github.com/brianvoe/gofakeit"
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 
 	"github.com/Timofey335/auth/internal/cache"
 	cacheMocks "github.com/Timofey335/auth/internal/cache/mocks"
-	"github.com/Timofey335/auth/internal/client/db"
-	dbMocks "github.com/Timofey335/auth/internal/client/db/mocks"
 	"github.com/Timofey335/auth/internal/model"
 	"github.com/Timofey335/auth/internal/repository"
 	repoMocks "github.com/Timofey335/auth/internal/repository/mocks"

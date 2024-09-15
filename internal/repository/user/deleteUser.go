@@ -5,10 +5,9 @@ import (
 	"log"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/Timofey335/platform_common/pkg/db"
 	"github.com/fatih/color"
 	"google.golang.org/protobuf/types/known/emptypb"
-
-	"github.com/Timofey335/auth/internal/client/db"
 )
 
 // DeleteUser - удаляет пользователя

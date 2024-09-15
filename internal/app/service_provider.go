@@ -4,6 +4,10 @@ import (
 	"context"
 	"log"
 
+	"github.com/Timofey335/platform_common/pkg/closer"
+	"github.com/Timofey335/platform_common/pkg/db"
+	"github.com/Timofey335/platform_common/pkg/db/pg"
+	"github.com/Timofey335/platform_common/pkg/db/transaction"
 	redigo "github.com/gomodule/redigo/redis"
 
 	"github.com/Timofey335/auth/internal/api/user"
@@ -11,10 +15,6 @@ import (
 	userCache "github.com/Timofey335/auth/internal/cache/user"
 	"github.com/Timofey335/auth/internal/client/cache"
 	"github.com/Timofey335/auth/internal/client/cache/redis"
-	"github.com/Timofey335/auth/internal/client/db"
-	"github.com/Timofey335/auth/internal/client/db/pg"
-	"github.com/Timofey335/auth/internal/client/db/transaction"
-	"github.com/Timofey335/auth/internal/closer"
 	"github.com/Timofey335/auth/internal/config"
 	"github.com/Timofey335/auth/internal/config/env"
 	"github.com/Timofey335/auth/internal/repository"

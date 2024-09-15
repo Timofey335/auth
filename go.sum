@@ -2,6 +2,10 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/Masterminds/squirrel v1.5.4 h1:uUcX/aBc8O7Fg9kaISIUsHXdKuqehiXAMQTYX8afzqM=
 github.com/Masterminds/squirrel v1.5.4/go.mod h1:NNaOrjSoIDfDA40n7sr2tPNZRfjzjA400rg+riTZj10=
+github.com/Timofey335/platform_common v0.0.0-20240915170502-8fa408eb0dac h1:95Dpb+OSblHKy/L4pyyWTuKUQUOu41Zo4kp4KjfsNj8=
+github.com/Timofey335/platform_common v0.0.0-20240915170502-8fa408eb0dac/go.mod h1:DLH1NnSc1s0uTeQgqA+9ezMLxK+jyXt/p0mgC+M4cgA=
+github.com/Timofey335/platform_common v0.0.0-20240915171406-cc9d8d58ba4f h1:hQZXcHiiTwgoPKN4oqLg8MDkOno0OgS29i1D4WVy0Cw=
+github.com/Timofey335/platform_common v0.0.0-20240915171406-cc9d8d58ba4f/go.mod h1:DLH1NnSc1s0uTeQgqA+9ezMLxK+jyXt/p0mgC+M4cgA=
 github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496/go.mod h1:oGkLhpf+kjZl6xBf758TQhh5XrAeiJv/7FRz/2spLIg=
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3dyBCFEj5IhUbnKptjxatkF07cF2ak3yi77so=
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
