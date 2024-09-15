@@ -3,11 +3,9 @@ package user
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/fatih/color"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -80,8 +78,6 @@ func (r *repo) UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*em
 	if rowsAffected == 0 {
 		return nil, fmt.Errorf("updating failed")
 	}
-
-	log.Println(color.BlueString("updated the user %v, with ctx: %v", user.ID, ctx))
 
 	return &emptypb.Empty{}, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit"
 	"github.com/gojuno/minimock/v3"
@@ -48,6 +49,15 @@ func TestCreateUser(t *testing.T) {
 			PasswordConfirm: password,
 			Role:            role,
 		}
+
+		cacheUser = &model.UserModel{
+			ID:        id,
+			Name:      name,
+			Email:     email,
+			Role:      role,
+			CreatedAt: time.Time{},
+			UpdatedAt: time.Time{},
+		}
 	)
 
 	defer t.Cleanup(mc.Finish)
@@ -76,7 +86,7 @@ func TestCreateUser(t *testing.T) {
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				// mock.CreateUserMock.Expect(ctx, req).Return(nil)
+				mock.CreateUserMock.Expect(ctx, cacheUser).Return(nil)
 				return mock
 			},
 			txManagerMock: func(mc *minimock.Controller) db.TxManager {
@@ -102,7 +112,6 @@ func TestCreateUser(t *testing.T) {
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				// mock.CreateUserMock.Expect(ctx, req).Return(serviceErr)
 				return mock
 			},
 			txManagerMock: func(mc *minimock.Controller) db.TxManager {
@@ -123,7 +132,7 @@ func TestCreateUser(t *testing.T) {
 			userCacheMock := tt.userCacheMock(mc)
 			txManagerMock := tt.txManagerMock(mc)
 
-			service := user.NewMockService(userRepoMock, userCacheMock, txManagerMock)
+			service := user.NewService(userRepoMock, userCacheMock, txManagerMock)
 
 			resHandler, err := service.CreateUser(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)

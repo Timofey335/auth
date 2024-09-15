@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"log"
-	"time"
 
 	"github.com/gomodule/redigo/redis"
 
@@ -100,10 +99,28 @@ func (c *client) Get(ctx context.Context, key string) (interface{}, error) {
 	return value, nil
 }
 
-// Expire - устанавлиает время жизни для ключа
-func (c *client) Expire(ctx context.Context, key string, expiration time.Duration) error {
+// DeleteHashSet - удаляет Hash set в redis по ключу
+func (c *client) DeleteHashSet(ctx context.Context, key string) error {
 	err := c.execute(ctx, func(ctx context.Context, conn redis.Conn) error {
-		_, err := conn.Do("EXPIRE", key, int(expiration.Seconds()))
+		var errEx error
+		_, errEx = conn.Do("DEL", key)
+		if errEx != nil {
+			return errEx
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+// Expire - устанавлиает время жизни для ключа
+func (c *client) Expire(ctx context.Context, key string, expiration int64) error {
+	err := c.execute(ctx, func(ctx context.Context, conn redis.Conn) error {
+		_, err := conn.Do("EXPIRE", key, expiration)
 		if err != nil {
 			return err
 		}

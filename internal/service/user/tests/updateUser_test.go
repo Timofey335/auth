@@ -78,7 +78,7 @@ func TestUpdateUser(t *testing.T) {
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				// mock.CreateUserMock.Expect(ctx, req).Return(nil)
+				mock.DeleteUserMock.Expect(ctx, id).Return(nil)
 				return mock
 			},
 			txManagaerMock: func(mc *minimock.Controller) db.TxManager {
@@ -104,7 +104,6 @@ func TestUpdateUser(t *testing.T) {
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				// mock.CreateUserMock.Expect(ctx, req).Return(nil)
 				return mock
 			},
 			txManagaerMock: func(mc *minimock.Controller) db.TxManager {
@@ -124,6 +123,7 @@ func TestUpdateUser(t *testing.T) {
 			userRepoMock := tt.userRepositoryMock(mc)
 			userCacheMock := tt.userCacheMock(mc)
 			txManagerMock := tt.txManagaerMock(mc)
+
 			service := user.NewService(userRepoMock, userCacheMock, txManagerMock)
 
 			resHandler, err := service.UpdateUser(tt.args.ctx, tt.args.req)

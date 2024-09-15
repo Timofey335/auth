@@ -9,6 +9,7 @@ type cacheImplementation struct {
 	cacheClient cacheClient.RedisClient
 }
 
+// NewCache - новый клиент для кэша
 func NewCache(cacheClient cacheClient.RedisClient) cache.UserCache {
 	return &cacheImplementation{
 		cacheClient: cacheClient,

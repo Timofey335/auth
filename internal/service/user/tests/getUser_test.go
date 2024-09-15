@@ -4,11 +4,16 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit"
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Timofey335/auth/internal/cache"
+	cacheMocks "github.com/Timofey335/auth/internal/cache/mocks"
+	"github.com/Timofey335/auth/internal/client/db"
+	dbMocks "github.com/Timofey335/auth/internal/client/db/mocks"
 	"github.com/Timofey335/auth/internal/model"
 	"github.com/Timofey335/auth/internal/repository"
 	repoMocks "github.com/Timofey335/auth/internal/repository/mocks"
@@ -17,6 +22,8 @@ import (
 
 func TestGetUser(t *testing.T) {
 	type userRepositoryMockFunc func(mc *minimock.Controller) repository.UserRepository
+	type userCacheMockFunc func(mc *minimock.Controller) cache.UserCache
+	type txManagerMockFunc func(mc *minimock.Controller) db.TxManager
 
 	type args struct {
 		ctx context.Context
@@ -35,9 +42,12 @@ func TestGetUser(t *testing.T) {
 		serviceErr = fmt.Errorf("service error")
 
 		res = &model.UserModel{
-			Name:  name,
-			Email: email,
-			Role:  role,
+			ID:        id,
+			Name:      name,
+			Email:     email,
+			Role:      role,
+			CreatedAt: time.Time{},
+			UpdatedAt: time.Time{},
 		}
 	)
 
@@ -49,6 +59,8 @@ func TestGetUser(t *testing.T) {
 		want               *model.UserModel
 		err                error
 		userRepositoryMock userRepositoryMockFunc
+		userCacheMock      userCacheMockFunc
+		txManagerMock      txManagerMockFunc
 	}{
 		{
 			name: "success case",
@@ -60,7 +72,15 @@ func TestGetUser(t *testing.T) {
 			err:  nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repoMocks.NewUserRepositoryMock(mc)
+				return mock
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
 				mock.GetUserMock.Expect(ctx, id).Return(res, nil)
+				return mock
+			},
+			txManagerMock: func(mc *minimock.Controller) db.TxManager {
+				mock := dbMocks.NewTxManagerMock(mc)
 				return mock
 			},
 		},
@@ -77,6 +97,15 @@ func TestGetUser(t *testing.T) {
 				mock.GetUserMock.Expect(ctx, id).Return(nil, serviceErr)
 				return mock
 			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				mock.GetUserMock.Expect(ctx, id).Return(nil, serviceErr)
+				return mock
+			},
+			txManagerMock: func(mc *minimock.Controller) db.TxManager {
+				mock := dbMocks.NewTxManagerMock(mc)
+				return mock
+			},
 		},
 	}
 
@@ -85,7 +114,10 @@ func TestGetUser(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			userRepoMock := tt.userRepositoryMock(mc)
-			service := user.NewMockService(userRepoMock)
+			userCacheMock := tt.userCacheMock(mc)
+			txManagerMock := tt.txManagerMock(mc)
+
+			service := user.NewService(userRepoMock, userCacheMock, txManagerMock)
 
 			resHandler, err := service.GetUser(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)

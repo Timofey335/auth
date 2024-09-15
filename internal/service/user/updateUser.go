@@ -47,12 +47,18 @@ func (s *serv) UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*em
 			return errTx
 		}
 
+		errTx = s.cache.DeleteUser(ctx, user.ID)
+		if errTx != nil {
+			return errTx
+		}
+
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
+
+	log.Println(color.BlueString("updated the user %v, with ctx: %v", user.ID, ctx))
 
 	return &emptypb.Empty{}, nil
 }

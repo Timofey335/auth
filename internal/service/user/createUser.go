@@ -50,6 +50,18 @@ func (s *serv) CreateUser(ctx context.Context, user *model.UserModel) (int64, er
 			return errTx
 		}
 
+		errTx = s.cache.CreateUser(ctx, &model.UserModel{
+			ID:        id,
+			Name:      user.Name,
+			Email:     user.Email,
+			Role:      user.Role,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		})
+		if errTx != nil {
+			return errTx
+		}
+
 		return nil
 	})
 
