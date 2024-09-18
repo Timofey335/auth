@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/Timofey335/auth/internal/config"
+	"github.com/Timofey335/auth/internal/interceptor"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
@@ -73,7 +74,10 @@ func (a *App) initServiceProvider(_ context.Context, _ string) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context, _ string) error {
-	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
+	)
 
 	reflection.Register(a.grpcServer)
 
