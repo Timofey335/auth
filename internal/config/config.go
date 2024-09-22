@@ -6,13 +6,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// GRPCConfig - интерфейс с методом Address
+// GRPCConfig - интерфейс конфигурации grpc сервера
 type GRPCConfig interface {
 	Address() string
 }
 
-// HTTPConfig - интерфейс с методом Address
+// HTTPConfig - интерфейс конфигурации http сервера
 type HTTPConfig interface {
+	Address() string
+}
+
+// SwaggerConfig - интерфейс конфигурации swagger сервера
+type SwaggerConfig interface {
 	Address() string
 }
 

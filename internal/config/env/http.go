@@ -34,6 +34,7 @@ func NewHTTPConfig() (*httpConfig, error) {
 	}, nil
 }
 
+// Address
 func (cfg *httpConfig) Address() string {
 	return net.JoinHostPort(cfg.host, cfg.port)
 }

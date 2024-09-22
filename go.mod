@@ -34,6 +34,8 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rakyll/statik v0.1.7 // indirect
+	github.com/rs/cors v1.11.1 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
