@@ -12,12 +12,12 @@ import (
 func (c *cacheImplementation) CreateUser(ctx context.Context, user *model.UserModel) error {
 	userCache := converter.ToUserCacheFromUserModel(user)
 	id := strconv.FormatInt(userCache.ID, 10)
+
 	if err := c.cacheClient.HashSet(ctx, id, userCache); err != nil {
 		return err
 	}
 
-	// Устанавливает TTL для кэшированных данных пользователя 3600 секунд
-	if err := c.cacheClient.Expire(ctx, id, 3600); err != nil {
+	if err := c.cacheClient.Expire(ctx, id); err != nil {
 		return err
 	}
 

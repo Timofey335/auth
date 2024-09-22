@@ -15,6 +15,7 @@ const (
 	redisConnectionTimeoutEnvName = "REDIS_CONNECTION_TIMEOUT_SEC"
 	redisMaxIdleEnvName           = "REDIS_MAX_IDLE"
 	redisIdleTimeoutEnvName       = "REDIS_IDLE_TIMEOUT_SEC"
+	redisUserExpiration           = "REDIS_USER_EXPIRATION"
 )
 
 type redisConfig struct {
@@ -23,8 +24,9 @@ type redisConfig struct {
 
 	connectionTimeout time.Duration
 
-	maxIdle     int
-	idleTimeout time.Duration
+	maxIdle        int
+	idleTimeout    time.Duration
+	userExpiration int64
 }
 
 // NewRedisConfig - конфигурация для redis
@@ -69,12 +71,23 @@ func NewRedisConfig() (*redisConfig, error) {
 		return nil, errors.Wrap(err, "failed to parse idle timeout")
 	}
 
+	userExpirationStr := os.Getenv(redisUserExpiration)
+	if len(userExpirationStr) == 0 {
+		return nil, errors.New("redis user expiration not found")
+	}
+
+	userExpiration, err := strconv.ParseInt(userExpirationStr, 10, 64)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse user expiration")
+	}
+
 	return &redisConfig{
 		host:              host,
 		port:              port,
 		connectionTimeout: time.Duration(connectionTimeout) * time.Second,
 		maxIdle:           maxIdle,
 		idleTimeout:       time.Duration(idleTimeout) * time.Second,
+		userExpiration:    userExpiration,
 	}, nil
 }
 
@@ -96,4 +109,9 @@ func (cfg *redisConfig) MaxIdle() int {
 // IdleTimeout - считывает из конфигурации максимальное время простоя соединения
 func (cfg *redisConfig) IdleTimeout() time.Duration {
 	return cfg.idleTimeout
+}
+
+// UserExpiration - считывает из конфигурации значение TTL для данных в кеше
+func (cfg *redisConfig) UserExpiration() int64 {
+	return cfg.userExpiration
 }

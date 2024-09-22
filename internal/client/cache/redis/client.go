@@ -118,9 +118,10 @@ func (c *client) DeleteHashSet(ctx context.Context, key string) error {
 }
 
 // Expire - устанавлиает время жизни для ключа
-func (c *client) Expire(ctx context.Context, key string, expiration int64) error {
+func (c *client) Expire(ctx context.Context, key string) error {
 	err := c.execute(ctx, func(ctx context.Context, conn redis.Conn) error {
-		_, err := conn.Do("EXPIRE", key, expiration)
+		// Время жизни устанавливается в env (REDIS_USER_EXPIRATION)
+		_, err := conn.Do("EXPIRE", key, c.config.UserExpiration())
 		if err != nil {
 			return err
 		}

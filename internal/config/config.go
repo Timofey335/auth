@@ -11,12 +11,18 @@ type GRPCConfig interface {
 	Address() string
 }
 
+// HTTPConfig - интерфейс с методом Address
+type HTTPConfig interface {
+	Address() string
+}
+
 // RedisConfig - интерфейс конфигурации redis
 type RedisConfig interface {
 	Address() string
 	ConnectionTimeout() time.Duration
 	MaxIdle() int
 	IdleTimeout() time.Duration
+	UserExpiration() int64
 }
 
 // PGConfig - интерфейс с методом DSN
