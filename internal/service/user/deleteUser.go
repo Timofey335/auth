@@ -12,5 +12,10 @@ func (s *serv) DeleteUser(ctx context.Context, id int64) (*emptypb.Empty, error)
 		return nil, err
 	}
 
+	err = s.cache.DeleteUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
 	return &emptypb.Empty{}, nil
 }

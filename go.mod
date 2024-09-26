@@ -1,9 +1,10 @@
 module github.com/Timofey335/auth
 
-go 1.22.5
+go 1.23.1
 
 require (
 	github.com/Masterminds/squirrel v1.5.4 // indirect
+	github.com/Timofey335/platform_common v0.0.0-20240915171406-cc9d8d58ba4f // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/brianvoe/gofakeit v3.18.0+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -11,7 +12,9 @@ require (
 	github.com/georgysavva/scany v1.2.2 // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible // indirect
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0 // indirect
+	github.com/gojuno/minimock/v3 v3.4.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
+	github.com/gomodule/redigo v1.9.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.3 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
