@@ -15,3 +15,8 @@ type UserService interface {
 	UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*emptypb.Empty, error)
 	DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, error)
 }
+
+// ConsumerService - интерфейс для consumer
+type ConsumerService interface {
+	RunConsumer(ctx context.Context) error
+}

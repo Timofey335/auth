@@ -3,6 +3,9 @@ version: '3'
 volumes:
   postgres_volume:
   redis-data:
+  kafka1:
+  kafka2:
+  kafka3:
 
 services:
   zookeeper:

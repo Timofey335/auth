@@ -4,10 +4,10 @@ github.com/IBM/sarama v1.43.3/go.mod h1:FVIRaLrhK3Cla/9FfRF5X9Zua2KpS3SYIXxhac1H
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/Masterminds/squirrel v1.5.4 h1:uUcX/aBc8O7Fg9kaISIUsHXdKuqehiXAMQTYX8afzqM=
 github.com/Masterminds/squirrel v1.5.4/go.mod h1:NNaOrjSoIDfDA40n7sr2tPNZRfjzjA400rg+riTZj10=
-github.com/Timofey335/platform_common v0.0.0-20240915170502-8fa408eb0dac h1:95Dpb+OSblHKy/L4pyyWTuKUQUOu41Zo4kp4KjfsNj8=
-github.com/Timofey335/platform_common v0.0.0-20240915170502-8fa408eb0dac/go.mod h1:DLH1NnSc1s0uTeQgqA+9ezMLxK+jyXt/p0mgC+M4cgA=
-github.com/Timofey335/platform_common v0.0.0-20240915171406-cc9d8d58ba4f h1:hQZXcHiiTwgoPKN4oqLg8MDkOno0OgS29i1D4WVy0Cw=
-github.com/Timofey335/platform_common v0.0.0-20240915171406-cc9d8d58ba4f/go.mod h1:DLH1NnSc1s0uTeQgqA+9ezMLxK+jyXt/p0mgC+M4cgA=
+github.com/Timofey335/platform_common v0.0.0-20240926210631-1a9ed2d5ecf8 h1:4zYzu3zO2exb+jK2LToNQwSjhlKo2czSrhO/e3tmUlw=
+github.com/Timofey335/platform_common v0.0.0-20240926210631-1a9ed2d5ecf8/go.mod h1:c77HI87JQgSwtcFY/G7yGTJN0xqxujLxFcDSozYyrx8=
+github.com/Timofey335/platform_common v0.0.0-20240926212134-5ddd1ae1b824 h1:wa4bG1XmQQhQmQDWnoVaE6z6Ljo22nzYyvOY59xpaxU=
+github.com/Timofey335/platform_common v0.0.0-20240926212134-5ddd1ae1b824/go.mod h1:GN9fYnzte5m+7DmWPkzRcvXHoXBXDUO3mgk1u6cJ5MI=
 github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496/go.mod h1:oGkLhpf+kjZl6xBf758TQhh5XrAeiJv/7FRz/2spLIg=
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3dyBCFEj5IhUbnKptjxatkF07cF2ak3yi77so=
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=

@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/IBM/sarama"
 	"github.com/joho/godotenv"
 )
 
@@ -33,6 +34,13 @@ type RedisConfig interface {
 // PGConfig - интерфейс с методом DSN
 type PGConfig interface {
 	DSN() string
+}
+
+// KafkaConsumerConfig - интерфейс kafka
+type KafkaConsumerConfig interface {
+	Brokers() []string
+	GroupID() string
+	Config() *sarama.Config
 }
 
 // Load - считывает переменные из env файла
