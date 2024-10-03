@@ -24,7 +24,7 @@ func main() {
 		log.Fatalf("failed to init app: %s", err.Error())
 	}
 
-	if err = a.Run(); err != nil {
+	if err = a.Run(ctx); err != nil {
 		log.Fatalf("failed ti run app: %s", err.Error())
 	}
 }

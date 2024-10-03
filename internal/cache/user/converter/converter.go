@@ -26,8 +26,8 @@ func ToUserCacheFromUserModel(user *model.UserModel) *modelCache.UserCacheModel 
 
 // ToUserModelFromUserCache - конвертер из модели UserCacheModel в модель UserModel
 func ToUserModelFromUserCache(user *modelCache.UserCacheModel) *model.UserModel {
-	createdAt := time.UnixMicro(user.CreatedAt)
-	updatedAt := time.UnixMicro(*user.UpdatedAt)
+	createdAt := time.Unix(0, user.CreatedAt)
+	updatedAt := time.Unix(0, *user.UpdatedAt)
 
 	return &model.UserModel{
 		ID:        user.ID,
