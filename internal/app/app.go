@@ -50,7 +50,7 @@ func (a *App) Run(ctx context.Context) error {
 	}()
 
 	wg := &sync.WaitGroup{}
-	wg.Add(4)
+	wg.Add(3)
 
 	go func() {
 		defer wg.Done()
@@ -70,15 +70,15 @@ func (a *App) Run(ctx context.Context) error {
 		}
 	}()
 
-	go func() {
-		defer wg.Done()
+	// go func() {
+	// 	defer wg.Done()
 
-		err := a.serviceProvider.UserSaverConsumer(ctx).RunConsumer(ctx)
-		if err != nil {
-			log.Printf("failed to run consumer: %s", err.Error())
-		}
+	// 	err := a.serviceProvider.UserSaverConsumer(ctx).RunConsumer(ctx)
+	// 	if err != nil {
+	// 		log.Printf("failed to run consumer: %s", err.Error())
+	// 	}
 
-	}()
+	// }()
 
 	go func() {
 		defer wg.Done()

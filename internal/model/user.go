@@ -24,3 +24,9 @@ type UserUpdateModel struct {
 	PasswordConfirm *string
 	Role            *int64
 }
+
+// UserData ...
+type UserData struct {
+	Username string `json:"username"`
+	Role     int64  `json:"role"`
+}
