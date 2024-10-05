@@ -28,12 +28,13 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig            config.PGConfig
-	redisConfig         config.RedisConfig
+	authConfig          config.AuthConfig
 	grpcConfig          config.GRPCConfig
 	httpConfig          config.HTTPConfig
-	swaggerConfig       config.SwaggerConfig
+	pgConfig            config.PGConfig
 	kafkaConsumerConfig config.KafkaConsumerConfig
+	redisConfig         config.RedisConfig
+	swaggerConfig       config.SwaggerConfig
 
 	dbClient  db.Client
 	txManager db.TxManager
@@ -56,6 +57,20 @@ type serviceProvider struct {
 
 func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
+}
+
+// AuthConfig - получает секреты из env файла
+func (s *serviceProvider) AuthConfig() config.AuthConfig {
+	if s.authConfig == nil {
+		cfg, err := env.NewAuthConfig()
+		if err != nil {
+			log.Fatalf("failed to get auth config: %s", err.Error())
+		}
+
+		s.authConfig = cfg
+	}
+
+	return s.authConfig
 }
 
 // PGConfig - инициализирует конфигурацию БД из env файла
@@ -223,6 +238,7 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 			s.UserRepository(ctx),
 			s.Cache(ctx),
 			s.TxManager(ctx),
+			s.AuthConfig(),
 		)
 	}
 

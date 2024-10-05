@@ -14,6 +14,7 @@ type UserService interface {
 	GetUser(ctx context.Context, userId int64) (*model.UserModel, error)
 	UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*emptypb.Empty, error)
 	DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, error)
+	Login(ctx context.Context, userLoginData *model.UserLoginModel) (string, error)
 }
 
 // ConsumerService - интерфейс для consumer

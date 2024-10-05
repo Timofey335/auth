@@ -6,6 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/Timofey335/auth/internal/model"
+	repoModel "github.com/Timofey335/auth/internal/repository/user/model"
 )
 
 // UserRepository - интерфейс repo слоя
@@ -14,4 +15,5 @@ type UserRepository interface {
 	GetUser(ctx context.Context, userId int64) (*model.UserModel, error)
 	UpdateUser(ctx context.Context, user *model.UserUpdateModel) (*emptypb.Empty, error)
 	DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, error)
+	GetUserData(ctx context.Context, userName string) (*repoModel.UserRepoModel, error)
 }

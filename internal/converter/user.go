@@ -71,3 +71,11 @@ func ToUserFromDescUpd(user *desc.UpdateUserRequest) *model.UserUpdateModel {
 		Role:            &role,
 	}
 }
+
+// ToUserFromDescLogin - конвертирует данные из для сервисного слоя при Login
+func ToUserFromDescLogin(userLoginData *desc.LoginRequest) *model.UserLoginModel {
+	return &model.UserLoginModel{
+		Email:    userLoginData.Email,
+		Password: userLoginData.Password,
+	}
+}
