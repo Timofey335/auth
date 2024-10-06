@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/fatih/color"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/Timofey335/auth/internal/model"
 )
@@ -19,8 +20,15 @@ func (s *serv) CreateUser(ctx context.Context, user *model.UserModel) (int64, er
 		return 0, err
 	}
 
+	passHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return 0, errors.New("error while hashing of the password")
+	}
+
+	user.Password = string(passHash)
+
 	var id int64
-	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
+	err = s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
 		var errTx error
 		id, errTx = s.userRepository.CreateUser(ctx, user)
 		if errTx != nil {

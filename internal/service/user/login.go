@@ -16,10 +16,8 @@ func (s *serv) Login(ctx context.Context, userLoginData *model.UserLoginModel) (
 		return "", err
 	}
 
-	//todo: to add hashing password
-
-	if userLoginData.Password != user.Password {
-		return "", errors.New("password incorrect")
+	if !utils.VerifyPassword(user.Password, userLoginData.Password) {
+		return "", errors.New("user not found or password incorrect")
 	}
 
 	refreshTokenExpiration := time.Duration(s.authConfig.RefreshTokenExpiration() * int64(time.Minute))
