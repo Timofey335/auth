@@ -9,13 +9,13 @@ import (
 	"github.com/Timofey335/auth/internal/model"
 )
 
-func GenerateToken(info model.UserData, secretKey []byte, duration time.Duration) (string, error) {
+func GenerateToken(userData model.UserLoginModel, secretKey []byte, duration time.Duration) (string, error) {
 	claims := model.UserClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(duration).Unix(),
 		},
-		Username: info.Username,
-		Role:     info.Role,
+		Email: userData.Email,
+		Role:  userData.Role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

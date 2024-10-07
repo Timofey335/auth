@@ -12,11 +12,11 @@ import (
 	"github.com/Timofey335/auth/internal/utils"
 )
 
-func (s *serv) GetRefreshToken(ctx context.Context, token string) (string, error) {
+func (s *serv) GetAccessToken(ctx context.Context, refreshToken string) (string, error) {
 	refreshTokenSecretKey := s.authConfig.RefreshTokenSecretKey()
 	refreshTokenExpiration := s.authConfig.RefreshTokenExpiration()
 
-	claims, err := utils.VerifyToken(token, []byte(refreshTokenSecretKey))
+	claims, err := utils.VerifyToken(refreshToken, []byte(refreshTokenSecretKey))
 	if err != nil {
 		return "", status.Errorf(codes.Aborted, "invalid refresh token")
 	}
@@ -26,7 +26,7 @@ func (s *serv) GetRefreshToken(ctx context.Context, token string) (string, error
 		return "", err
 	}
 
-	refreshToken, err := utils.GenerateToken(model.UserLoginModel{
+	accessToken, err := utils.GenerateToken(model.UserLoginModel{
 		Email: user.Email,
 		Role:  user.Role,
 	},
@@ -37,5 +37,5 @@ func (s *serv) GetRefreshToken(ctx context.Context, token string) (string, error
 		return "", errors.New("failed to generate token")
 	}
 
-	return refreshToken, nil
+	return accessToken, nil
 }

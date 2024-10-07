@@ -22,9 +22,9 @@ func (s *serv) Login(ctx context.Context, userLoginData *model.UserLoginModel) (
 
 	refreshTokenExpiration := time.Duration(s.authConfig.RefreshTokenExpiration() * int64(time.Minute))
 
-	refreshToken, err := utils.GenerateToken(model.UserData{
-		Username: userLoginData.Email,
-		Role:     user.Role,
+	refreshToken, err := utils.GenerateToken(model.UserLoginModel{
+		Email: userLoginData.Email,
+		Role:  user.Role,
 	},
 		[]byte(s.authConfig.RefreshTokenSecretKey()),
 		refreshTokenExpiration,
