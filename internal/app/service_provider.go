@@ -13,6 +13,7 @@ import (
 	kafkaConsumer "github.com/Timofey335/platform_common/pkg/kafka/consumer"
 	redigo "github.com/gomodule/redigo/redis"
 
+	"github.com/Timofey335/auth/internal/api/access"
 	"github.com/Timofey335/auth/internal/api/user"
 	cacheImplementation "github.com/Timofey335/auth/internal/cache"
 	userCache "github.com/Timofey335/auth/internal/cache/user"
@@ -23,6 +24,7 @@ import (
 	"github.com/Timofey335/auth/internal/repository"
 	userRepository "github.com/Timofey335/auth/internal/repository/user"
 	"github.com/Timofey335/auth/internal/service"
+	accessService "github.com/Timofey335/auth/internal/service/access"
 	userSaverConsumer "github.com/Timofey335/auth/internal/service/consumer/user_saver"
 	userService "github.com/Timofey335/auth/internal/service/user"
 )
@@ -45,6 +47,7 @@ type serviceProvider struct {
 	redisPool   *redigo.Pool
 	redisClient cache.RedisClient
 
+	accessService     service.AccessService
 	userService       service.UserService
 	userSaverConsumer service.ConsumerService
 
@@ -52,7 +55,8 @@ type serviceProvider struct {
 	consumerGroup        sarama.ConsumerGroup
 	consumerGroupHandler *kafkaConsumer.GroupHandler
 
-	servImplementation *user.Implementation
+	servImplementation       *user.Implementation
+	accessServImplementation *access.AccessImplementation
 }
 
 func newServiceProvider() *serviceProvider {
@@ -222,6 +226,20 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	return s.txManager
 }
 
+// AccessService - инициализация сервисного слоя access
+func (s *serviceProvider) AccessService(ctx context.Context) service.AccessService {
+	if s.accessService == nil {
+		s.accessService = accessService.NewService(
+			s.UserRepository(ctx),
+			s.Cache(ctx),
+			s.TxManager(ctx),
+			s.AuthConfig(),
+		)
+	}
+
+	return s.accessService
+}
+
 // UserRepository - инициализация repo слоя
 func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRepository {
 	if s.userRepository == nil {
@@ -231,7 +249,7 @@ func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRep
 	return s.userRepository
 }
 
-// UserService - инициализация сервисного слоя
+// UserService - инициализация сервисного слоя user
 func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
 		s.userService = userService.NewService(
@@ -304,4 +322,13 @@ func (s *serviceProvider) ServImplementation(ctx context.Context) *user.Implemen
 	}
 
 	return s.servImplementation
+}
+
+// AccessServImplementation - инициализация api слоя access
+func (s *serviceProvider) AccessServImplementation(ctx context.Context) *access.AccessImplementation {
+	if s.accessServImplementation == nil {
+		s.accessServImplementation = access.NewAccessImplementation(s.AccessService(ctx))
+	}
+
+	return s.accessServImplementation
 }

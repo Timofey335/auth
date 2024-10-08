@@ -23,3 +23,8 @@ type UserService interface {
 type ConsumerService interface {
 	RunConsumer(ctx context.Context) error
 }
+
+// AccessService - интерфейс сервисного слоя access
+type AccessService interface {
+	Check(ctx context.Context, s string) (*emptypb.Empty, error)
+}
