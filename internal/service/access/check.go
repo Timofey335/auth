@@ -15,7 +15,8 @@ import (
 const (
 	authPrefix = "Bearer "
 
-	accessTokenSecretKey = "VqvguGiffXILza1f44TWXowDT4zwf03dtXmqWW4SYyE="
+	refreshTokenSecretKey = "W4/X+LLjehdxptt4YgGFCvMpq5ewptpZZYRHY6A72g0="
+	accessTokenSecretKey  = "VqvguGiffXILza1f44TWXowDT4zwf03dtXmqWW4SYyE="
 )
 
 var accessibleRoles map[string]int64
@@ -47,7 +48,7 @@ func (s *serv) Check(ctx context.Context, endpointAddress string) (*emptypb.Empt
 		return &emptypb.Empty{}, nil
 	}
 
-	return &emptypb.Empty{}, nil
+	return nil, errors.New("access denied")
 }
 
 // Возвращает мапу с адресом эндпоинта и ролью, которая имеет доступ к нему

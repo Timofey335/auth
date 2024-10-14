@@ -12,9 +12,13 @@ import (
 	"github.com/Timofey335/auth/internal/utils"
 )
 
+const (
+	accessTokenSecretKey = "VqvguGiffXILza1f44TWXowDT4zwf03dtXmqWW4SYyE="
+)
+
 func (s *serv) GetAccessToken(ctx context.Context, refreshToken string) (string, error) {
 	refreshTokenSecretKey := s.authConfig.RefreshTokenSecretKey()
-	refreshTokenExpiration := s.authConfig.RefreshTokenExpiration()
+	// refreshTokenExpiration := s.authConfig.RefreshTokenExpiration()
 
 	claims, err := utils.VerifyToken(refreshToken, []byte(refreshTokenSecretKey))
 	if err != nil {
@@ -30,8 +34,8 @@ func (s *serv) GetAccessToken(ctx context.Context, refreshToken string) (string,
 		Email: user.Email,
 		Role:  user.Role,
 	},
-		[]byte(refreshTokenSecretKey),
-		time.Duration(refreshTokenExpiration),
+		[]byte(accessTokenSecretKey),
+		60*time.Minute,
 	)
 	if err != nil {
 		return "", errors.New("failed to generate token")

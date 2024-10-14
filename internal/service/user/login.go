@@ -20,13 +20,15 @@ func (s *serv) Login(ctx context.Context, userLoginData *model.UserLoginModel) (
 		return "", errors.New("user not found or password incorrect")
 	}
 
-	refreshTokenExpiration := time.Duration(s.authConfig.RefreshTokenExpiration() * int64(time.Minute))
+	refreshTokenSecretKey := s.authConfig.RefreshTokenSecretKey()
+	// refreshTokenExpiration := time.Duration(s.authConfig.RefreshTokenExpiration() * int64(time.Minute))
+	refreshTokenExpiration := 60 * time.Minute
 
 	refreshToken, err := utils.GenerateToken(model.UserLoginModel{
 		Email: userLoginData.Email,
 		Role:  user.Role,
 	},
-		[]byte(s.authConfig.RefreshTokenSecretKey()),
+		[]byte(refreshTokenSecretKey),
 		refreshTokenExpiration,
 	)
 	if err != nil {
