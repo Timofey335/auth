@@ -21,6 +21,7 @@ const (
 
 var accessibleRoles map[string]int64
 
+// Check - проверяет токен на подлинность и на доступ к эндпоинтам
 func (s *serv) Check(ctx context.Context, endpointAddress string) (*emptypb.Empty, error) {
 	authHeader, err := authHeader(ctx)
 	if err != nil {
