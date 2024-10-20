@@ -9,7 +9,7 @@ import (
 	"github.com/Timofey335/auth/internal/utils"
 )
 
-// Login - метод для аутентификации и получения токена
+// Login - метод для аутентификации и получения refresh токена
 func (s *serv) Login(ctx context.Context, userLoginData *model.UserLoginModel) (string, error) {
 	user, err := s.userRepository.GetUserData(ctx, userLoginData.Email)
 	if err != nil {
@@ -20,13 +20,14 @@ func (s *serv) Login(ctx context.Context, userLoginData *model.UserLoginModel) (
 		return "", errors.New("user not found or password incorrect")
 	}
 
+	refreshTokenSecretKey := s.authConfig.RefreshTokenSecretKey()
 	refreshTokenExpiration := time.Duration(s.authConfig.RefreshTokenExpiration() * int64(time.Minute))
 
 	refreshToken, err := utils.GenerateToken(model.UserLoginModel{
 		Email: userLoginData.Email,
 		Role:  user.Role,
 	},
-		[]byte(s.authConfig.RefreshTokenSecretKey()),
+		[]byte(refreshTokenSecretKey),
 		refreshTokenExpiration,
 	)
 	if err != nil {

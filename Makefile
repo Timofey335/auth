@@ -51,14 +51,14 @@ generate-access-api:
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	api/access_v1/access.proto
 
-local-migration-status:
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
+migration-status:
+	${BIN}/goose -dir ${MIGRATION_DIR} postgres ${PG_DSN} status -v
 
-local-migration-up:
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
+migration-up:
+	${BIN}/goose -dir ${MIGRATION_DIR} postgres ${PG_DSN} up -v
 
-local-migration-down:
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
+migration-down:
+	${BIN}/goose -dir ${MIGRATION_DIR} postgres ${PG_DSN} down -v
 
 test:
 	go clean -testcache

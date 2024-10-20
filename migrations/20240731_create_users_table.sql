@@ -9,5 +9,15 @@ CREATE TABLE users (
     updated_at TIMESTAMP
 );
 
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    endpoint VARCHAR(255) NOT NULL UNIQUE,
+    role INT NOT NULL
+);
+
+INSERT INTO roles (endpoint, role) VALUES ('/chat_server_v1.Chat_server_v1/CreateChat', 1);
+INSERT INTO roles (endpoint, role) VALUES ('/chat_server_v1.Chat_server_v1/DeleteChat', 1);
+INSERT INTO roles (endpoint, role) VALUES ('/chat_server_v1.Chat_server_v1/SendMessage', 0);
+
 -- +goose Down
-DROP TABLE users;
+DROP TABLE users, roles;

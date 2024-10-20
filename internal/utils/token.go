@@ -9,6 +9,7 @@ import (
 	"github.com/Timofey335/auth/internal/model"
 )
 
+// GenerateToken - генерирует токен
 func GenerateToken(userData model.UserLoginModel, secretKey []byte, duration time.Duration) (string, error) {
 	claims := model.UserClaims{
 		StandardClaims: jwt.StandardClaims{
@@ -23,6 +24,7 @@ func GenerateToken(userData model.UserLoginModel, secretKey []byte, duration tim
 	return token.SignedString(secretKey)
 }
 
+// VerifyToken - проверяет подлинность токена
 func VerifyToken(tokenStr string, secretKey []byte) (*model.UserClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		tokenStr,

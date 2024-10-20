@@ -12,9 +12,11 @@ import (
 	"github.com/Timofey335/auth/internal/utils"
 )
 
+// GetAccessToken - возврещает access токен
 func (s *serv) GetAccessToken(ctx context.Context, refreshToken string) (string, error) {
+	accessTokenSecretKey := s.authConfig.AccessTokenSecretKey()
+	accessTokenExpiration := time.Duration(s.authConfig.AccessTokenExpiration() * int64(time.Minute))
 	refreshTokenSecretKey := s.authConfig.RefreshTokenSecretKey()
-	refreshTokenExpiration := s.authConfig.RefreshTokenExpiration()
 
 	claims, err := utils.VerifyToken(refreshToken, []byte(refreshTokenSecretKey))
 	if err != nil {
@@ -27,11 +29,11 @@ func (s *serv) GetAccessToken(ctx context.Context, refreshToken string) (string,
 	}
 
 	accessToken, err := utils.GenerateToken(model.UserLoginModel{
-		Email: user.Email,
+		Email: claims.Email,
 		Role:  user.Role,
 	},
-		[]byte(refreshTokenSecretKey),
-		time.Duration(refreshTokenExpiration),
+		[]byte(accessTokenSecretKey),
+		accessTokenExpiration,
 	)
 	if err != nil {
 		return "", errors.New("failed to generate token")

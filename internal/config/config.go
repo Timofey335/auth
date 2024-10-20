@@ -45,6 +45,8 @@ type KafkaConsumerConfig interface {
 
 // AuthConfig - интерфейс для auth
 type AuthConfig interface {
+	AccessTokenSecretKey() string
+	AccessTokenExpiration() int64
 	RefreshTokenSecretKey() string
 	RefreshTokenExpiration() int64
 }

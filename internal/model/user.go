@@ -25,12 +25,6 @@ type UserUpdateModel struct {
 	Role            *int64
 }
 
-// // UserData ...
-// type UserData struct {
-// 	Username string `json:"username"`
-// 	Role     int64  `json:"role"`
-// }
-
 type UserLoginModel struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

@@ -12,9 +12,10 @@ import (
 	"github.com/Timofey335/auth/internal/utils"
 )
 
+// GetRefreshToken - возвращает refresh токен
 func (s *serv) GetRefreshToken(ctx context.Context, token string) (string, error) {
 	refreshTokenSecretKey := s.authConfig.RefreshTokenSecretKey()
-	refreshTokenExpiration := s.authConfig.RefreshTokenExpiration()
+	refreshTokenExpiration := time.Duration(s.authConfig.RefreshTokenExpiration() * int64(time.Minute))
 
 	claims, err := utils.VerifyToken(token, []byte(refreshTokenSecretKey))
 	if err != nil {
@@ -27,11 +28,11 @@ func (s *serv) GetRefreshToken(ctx context.Context, token string) (string, error
 	}
 
 	refreshToken, err := utils.GenerateToken(model.UserLoginModel{
-		Email: user.Email,
+		Email: claims.Email,
 		Role:  user.Role,
 	},
 		[]byte(refreshTokenSecretKey),
-		time.Duration(refreshTokenExpiration),
+		refreshTokenExpiration,
 	)
 	if err != nil {
 		return "", errors.New("failed to generate token")

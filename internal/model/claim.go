@@ -2,10 +2,7 @@ package model
 
 import "github.com/dgrijalva/jwt-go"
 
-const (
-	ExamplePath = "/note_v1.NoteV1/Get"
-)
-
+// UserClaims - модель для работы c jwt токеном
 type UserClaims struct {
 	jwt.StandardClaims
 	Email string `json:"email"`
