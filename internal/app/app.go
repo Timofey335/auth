@@ -72,15 +72,15 @@ func (a *App) Run(ctx context.Context) error {
 		}
 	}()
 
-	// go func() {
-	// 	defer wg.Done()
+	go func() {
+		defer wg.Done()
 
-	// 	err := a.serviceProvider.UserSaverConsumer(ctx).RunConsumer(ctx)
-	// 	if err != nil {
-	// 		log.Printf("failed to run consumer: %s", err.Error())
-	// 	}
+		err := a.serviceProvider.UserSaverConsumer(ctx).RunConsumer(ctx)
+		if err != nil {
+			log.Printf("failed to run consumer: %s", err.Error())
+		}
 
-	// }()
+	}()
 
 	go func() {
 		defer wg.Done()

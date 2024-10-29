@@ -6,6 +6,7 @@ import (
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
+// GetRefreshToken - возвращает refresh токен
 func (i *Implementation) GetRefreshToken(ctx context.Context, req *desc.GetRefreshTokenRequest) (*desc.GetRefreshTokenResponse, error) {
 	token := req.GetRefreshToken()
 	refreshToken, err := i.userService.GetRefreshToken(ctx, token)

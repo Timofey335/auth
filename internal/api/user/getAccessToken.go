@@ -6,6 +6,7 @@ import (
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
+// GetAccessToken - возврещает access токен
 func (i *Implementation) GetAccessToken(ctx context.Context, req *desc.GetAccessTokenRequest) (*desc.GetAccessTokenResponse, error) {
 	token := req.GetRefreshToken()
 	accessToken, err := i.userService.GetAccessToken(ctx, token)
