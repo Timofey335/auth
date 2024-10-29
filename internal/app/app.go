@@ -138,10 +138,6 @@ func (a *App) initGRPCServer(ctx context.Context, _ string) error {
 		grpc.Creds(creds),
 		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
 	)
-	// a.grpcServer = grpc.NewServer(
-	// 	grpc.Creds(insecure.NewCredentials()),
-	// 	grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
-	// )
 
 	reflection.Register(a.grpcServer)
 
