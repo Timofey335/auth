@@ -165,9 +165,6 @@ func (a *App) initHTTPServer(ctx context.Context, _ string) error {
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(creds),
 	}
-	// opts := []grpc.DialOption{
-	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
-	// }
 
 	err = descAuth.RegisterAuthV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts)
 	if err != nil {
