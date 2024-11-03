@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
 
 	"github.com/IBM/sarama"
-	"github.com/fatih/color"
+	"go.uber.org/zap"
 
+	"github.com/Timofey335/auth/internal/logger"
 	"github.com/Timofey335/auth/internal/model"
 )
 
@@ -22,7 +22,6 @@ func (s *service) UserSaveHandler(ctx context.Context, msg *sarama.ConsumerMessa
 
 	if user.Password != user.PasswordConfirm {
 		err := errors.New("password doesn't match")
-		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
 
 		return err
 	}
@@ -32,7 +31,7 @@ func (s *service) UserSaveHandler(ctx context.Context, msg *sarama.ConsumerMessa
 		return err
 	}
 
-	log.Println(color.BlueString("create user: id-%d %v, with ctx: %v", id, user, ctx))
+	logger.Info("Created user", zap.Any("Id", id), zap.String("Name", user.Name), zap.String("Email", user.Email))
 
 	return nil
 }

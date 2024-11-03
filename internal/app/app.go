@@ -9,17 +9,17 @@ import (
 	"sync"
 
 	"github.com/Timofey335/platform_common/pkg/closer"
-	"github.com/fatih/color"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/Timofey335/auth/internal/config"
 	"github.com/Timofey335/auth/internal/interceptor"
+	"github.com/Timofey335/auth/internal/logger"
 	descAccess "github.com/Timofey335/auth/pkg/access_v1"
 	descAuth "github.com/Timofey335/auth/pkg/auth_v1"
 	_ "github.com/Timofey335/auth/statik"
@@ -52,7 +52,7 @@ func (a *App) Run(ctx context.Context) error {
 	}()
 
 	wg := &sync.WaitGroup{}
-	wg.Add(3)
+	wg.Add(4)
 
 	go func() {
 		defer wg.Done()
@@ -103,6 +103,7 @@ func (a *App) initDeps(ctx context.Context, cfg string) error {
 		a.initGRPCServer,
 		a.initHTTPServer,
 		a.initSwaggerServer,
+		a.initLogger,
 	}
 
 	for _, f := range inits {
@@ -111,6 +112,12 @@ func (a *App) initDeps(ctx context.Context, cfg string) error {
 		}
 
 	}
+
+	return nil
+}
+
+func (a *App) initLogger(_ context.Context, _ string) error {
+	a.serviceProvider.Logger()
 
 	return nil
 }
@@ -138,10 +145,6 @@ func (a *App) initGRPCServer(ctx context.Context, _ string) error {
 		grpc.Creds(creds),
 		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
 	)
-	// a.grpcServer = grpc.NewServer(
-	// 	grpc.Creds(insecure.NewCredentials()),
-	// 	grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
-	// )
 
 	reflection.Register(a.grpcServer)
 
@@ -154,11 +157,19 @@ func (a *App) initGRPCServer(ctx context.Context, _ string) error {
 func (a *App) initHTTPServer(ctx context.Context, _ string) error {
 	mux := runtime.NewServeMux()
 
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	creds, err := credentials.NewClientTLSFromFile("cert/service.pem", "")
+	if err != nil {
+		log.Fatalf("could not process the credentials: %v", err)
 	}
 
-	err := descAuth.RegisterAuthV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts)
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(creds),
+	}
+	// opts := []grpc.DialOption{
+	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
+	// }
+
+	err = descAuth.RegisterAuthV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts)
 	if err != nil {
 		return err
 	}
@@ -197,7 +208,7 @@ func (a *App) initSwaggerServer(_ context.Context, _ string) error {
 }
 
 func (a *App) runGRPCServer() error {
-	log.Printf(color.BlueString("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address()))
+	logger.Info("GRPC server is running on", zap.String("address", a.serviceProvider.GRPCConfig().Address()))
 
 	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Address())
 	if err != nil {
@@ -212,7 +223,7 @@ func (a *App) runGRPCServer() error {
 }
 
 func (a *App) runHTTPServer() error {
-	log.Printf(color.BlueString("HTTP server is running on %s", a.serviceProvider.HTTPConfig().Address()))
+	logger.Info("HTTP server is running on", zap.String("address", a.serviceProvider.HTTPConfig().Address()))
 
 	err := a.httpServer.ListenAndServe()
 	if err != nil {
@@ -223,7 +234,7 @@ func (a *App) runHTTPServer() error {
 }
 
 func (a *App) runSwaggerServer() error {
-	log.Printf(color.BlueString("Swagger server is running on %s", a.serviceProvider.SwaggerConfig().Address()))
+	logger.Info("Swagger server is running on", zap.String("address", a.serviceProvider.SwaggerConfig().Address()))
 
 	err := a.swaggerServer.ListenAndServe()
 	if err != nil {
@@ -235,7 +246,7 @@ func (a *App) runSwaggerServer() error {
 
 func serveSwaggerFile(path string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Serving swagger file: %s", path)
+		logger.Info("Serving swagger file", zap.String("path", path))
 
 		statikFs, err := fs.New()
 		if err != nil {
@@ -243,7 +254,7 @@ func serveSwaggerFile(path string) http.HandlerFunc {
 			return
 		}
 
-		log.Printf("Open swagger file: %s", path)
+		logger.Info("Open swagger file", zap.String("path", path))
 
 		file, err := statikFs.Open(path)
 		if err != nil {
@@ -252,7 +263,7 @@ func serveSwaggerFile(path string) http.HandlerFunc {
 		}
 		defer file.Close()
 
-		log.Printf("Read swagger file: %s", path)
+		logger.Info("Read swagger file", zap.String("path", path))
 
 		content, err := io.ReadAll(file)
 		if err != nil {
@@ -260,7 +271,7 @@ func serveSwaggerFile(path string) http.HandlerFunc {
 			return
 		}
 
-		log.Printf("Write swagger file: %s", path)
+		logger.Info("Write swagger file", zap.String("path", path))
 
 		w.Header().Set("Content-Type", "application/json")
 		_, err = w.Write(content)
@@ -269,6 +280,6 @@ func serveSwaggerFile(path string) http.HandlerFunc {
 			return
 		}
 
-		log.Printf("Served swagger file: %s", path)
+		logger.Info("Served swagger file", zap.String("path", path))
 	}
 }

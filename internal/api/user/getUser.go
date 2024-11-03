@@ -2,11 +2,11 @@ package user
 
 import (
 	"context"
-	"log"
 
-	"github.com/fatih/color"
+	"go.uber.org/zap"
 
 	"github.com/Timofey335/auth/internal/converter"
+	"github.com/Timofey335/auth/internal/logger"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
@@ -17,7 +17,7 @@ func (i *Implementation) GetUser(ctx context.Context, req *desc.GetUserRequest) 
 		return nil, err
 	}
 
-	log.Println(color.BlueString("Get user by id: %d", userObj.ID))
+	logger.Info("Get user", zap.Any("Id", req.Id), zap.String("Name", userObj.Name), zap.String("Email", userObj.Email))
 
 	userObjConvert := converter.ToUserFromService(userObj)
 

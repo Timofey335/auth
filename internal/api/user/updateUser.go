@@ -1,10 +1,12 @@
 package user
 
 import (
+	"go.uber.org/zap"
 	"golang.org/x/net/context"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/Timofey335/auth/internal/converter"
+	"github.com/Timofey335/auth/internal/logger"
 	desc "github.com/Timofey335/auth/pkg/auth_v1"
 )
 
@@ -14,6 +16,8 @@ func (i *Implementation) UpdateUser(ctx context.Context, req *desc.UpdateUserReq
 	if err != nil {
 		return nil, err
 	}
+
+	logger.Info("Updated user", zap.Any("Id", req.Id))
 
 	return &emptypb.Empty{}, nil
 }

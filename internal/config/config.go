@@ -51,6 +51,15 @@ type AuthConfig interface {
 	RefreshTokenExpiration() int64
 }
 
+// LoggerConfig - интерфейс для логгера
+type LoggerConfig interface {
+	LogLevel() string
+	LogFilename() string
+	LogFileMaxSize() int
+	LogFileMaxBackups() int
+	LogFileMaxAge() int
+}
+
 // Load - считывает переменные из env файла
 func Load(path string) error {
 	err := godotenv.Load(path)

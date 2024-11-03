@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/IBM/sarama"
 	"github.com/Timofey335/platform_common/pkg/closer"
@@ -12,6 +13,9 @@ import (
 	"github.com/Timofey335/platform_common/pkg/kafka"
 	kafkaConsumer "github.com/Timofey335/platform_common/pkg/kafka/consumer"
 	redigo "github.com/gomodule/redigo/redis"
+	"github.com/natefinch/lumberjack"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/Timofey335/auth/internal/api/access"
 	"github.com/Timofey335/auth/internal/api/user"
@@ -21,6 +25,7 @@ import (
 	"github.com/Timofey335/auth/internal/client/cache/redis"
 	"github.com/Timofey335/auth/internal/config"
 	"github.com/Timofey335/auth/internal/config/env"
+	"github.com/Timofey335/auth/internal/logger"
 	"github.com/Timofey335/auth/internal/repository"
 	accessRepository "github.com/Timofey335/auth/internal/repository/access"
 	userRepository "github.com/Timofey335/auth/internal/repository/user"
@@ -34,8 +39,9 @@ type serviceProvider struct {
 	authConfig          config.AuthConfig
 	grpcConfig          config.GRPCConfig
 	httpConfig          config.HTTPConfig
-	pgConfig            config.PGConfig
 	kafkaConsumerConfig config.KafkaConsumerConfig
+	loggerConfig        config.LoggerConfig
+	pgConfig            config.PGConfig
 	redisConfig         config.RedisConfig
 	swaggerConfig       config.SwaggerConfig
 
@@ -159,6 +165,58 @@ func (s *serviceProvider) KafkaConsumerConfig() config.KafkaConsumerConfig {
 	}
 
 	return s.kafkaConsumerConfig
+}
+
+// LoggerConfig - инициализирует конфигурацию логгера из env
+func (s *serviceProvider) LoggerConfig() config.LoggerConfig {
+	if s.loggerConfig == nil {
+		cfg, err := env.NewLoggerConfig()
+		if err != nil {
+			log.Fatalf("failed to get logger config: %s", err.Error())
+		}
+
+		s.loggerConfig = cfg
+	}
+
+	return s.loggerConfig
+}
+
+// Logger - конфигурирует формат логгера и запись лого в файл
+func (s *serviceProvider) Logger() {
+	cfg := s.LoggerConfig()
+
+	stdout := zapcore.AddSync(os.Stdout)
+
+	var level zapcore.Level
+	if err := level.Set(cfg.LogLevel()); err != nil {
+		log.Fatalf("failed to set log level: %v", err)
+	}
+
+	atomicLevel := zap.NewAtomicLevelAt(level)
+
+	file := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   cfg.LogFilename(),
+		MaxSize:    cfg.LogFileMaxSize(),
+		MaxBackups: cfg.LogFileMaxBackups(),
+		MaxAge:     cfg.LogFileMaxAge(),
+	})
+
+	productionCfg := zap.NewProductionEncoderConfig()
+	productionCfg.TimeKey = "timestamp"
+	productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	developmentCfg := zap.NewDevelopmentEncoderConfig()
+	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
+	consoleEncoder := zapcore.NewConsoleEncoder(developmentCfg)
+	fileEncoder := zapcore.NewJSONEncoder(productionCfg)
+
+	core := zapcore.NewTee(
+		zapcore.NewCore(consoleEncoder, stdout, atomicLevel),
+		zapcore.NewCore(fileEncoder, file, atomicLevel),
+	)
+
+	logger.Init(core)
 }
 
 // RedisPool - конфигурация redis pool

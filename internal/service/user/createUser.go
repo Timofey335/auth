@@ -3,9 +3,7 @@ package user
 import (
 	"context"
 	"errors"
-	"log"
 
-	"github.com/fatih/color"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/Timofey335/auth/internal/model"
@@ -15,7 +13,6 @@ import (
 func (s *serv) CreateUser(ctx context.Context, user *model.UserModel) (int64, error) {
 	if user.Password != user.PasswordConfirm {
 		err := errors.New("password doesn't match")
-		log.Println(color.HiMagentaString("error while creating the new user: %v, with ctx: %v", err, ctx))
 
 		return 0, err
 	}
@@ -53,8 +50,6 @@ func (s *serv) CreateUser(ctx context.Context, user *model.UserModel) (int64, er
 	if err != nil {
 		return 0, err
 	}
-
-	log.Println(color.BlueString("create user: %v, with ctx: %v", user, ctx))
 
 	return id, nil
 }

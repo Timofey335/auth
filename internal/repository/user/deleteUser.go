@@ -2,11 +2,9 @@ package user
 
 import (
 	"context"
-	"log"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/Timofey335/platform_common/pkg/db"
-	"github.com/fatih/color"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -31,11 +29,8 @@ func (r *repo) DeleteUser(ctx context.Context, userId int64) (*emptypb.Empty, er
 
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id)
 	if err != nil {
-		log.Println(color.HiMagentaString("error while deleting the user: %v, with ctx: %v", err, ctx))
 		return nil, err
 	}
-
-	log.Println(color.HiMagentaString("deleted the user: id %v, with ctx: %v", id, ctx))
 
 	return &emptypb.Empty{}, nil
 }

@@ -2,9 +2,6 @@ package user
 
 import (
 	"context"
-	"log"
-
-	"github.com/fatih/color"
 
 	"github.com/Timofey335/auth/internal/model"
 )
@@ -15,8 +12,6 @@ func (s *serv) GetUser(ctx context.Context, id int64) (*model.UserModel, error) 
 
 	user, err := s.cache.GetUser(ctx, id)
 	if err != nil {
-		log.Println(color.HiMagentaString("getting the user with id-%d error: %v", id, err))
-
 		user, err = s.userRepository.GetUser(ctx, id)
 		if err != nil {
 			return nil, err
