@@ -7,6 +7,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// AuthConfig - интерфейс для auth
+type AuthConfig interface {
+	AccessTokenSecretKey() string
+	AccessTokenExpiration() int64
+	RefreshTokenSecretKey() string
+	RefreshTokenExpiration() int64
+}
+
 // GRPCConfig - интерфейс конфигурации grpc сервера
 type GRPCConfig interface {
 	Address() string
@@ -17,25 +25,6 @@ type HTTPConfig interface {
 	Address() string
 }
 
-// SwaggerConfig - интерфейс конфигурации swagger сервера
-type SwaggerConfig interface {
-	Address() string
-}
-
-// RedisConfig - интерфейс конфигурации redis
-type RedisConfig interface {
-	Address() string
-	ConnectionTimeout() time.Duration
-	MaxIdle() int
-	IdleTimeout() time.Duration
-	UserExpiration() int64
-}
-
-// PGConfig - интерфейс с методом DSN
-type PGConfig interface {
-	DSN() string
-}
-
 // KafkaConsumerConfig - интерфейс kafka
 type KafkaConsumerConfig interface {
 	Brokers() []string
@@ -43,12 +32,14 @@ type KafkaConsumerConfig interface {
 	Config() *sarama.Config
 }
 
-// AuthConfig - интерфейс для auth
-type AuthConfig interface {
-	AccessTokenSecretKey() string
-	AccessTokenExpiration() int64
-	RefreshTokenSecretKey() string
-	RefreshTokenExpiration() int64
+// Load - считывает переменные из env файла
+func Load(path string) error {
+	err := godotenv.Load(path)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // LoggerConfig - интерфейс для логгера
@@ -60,12 +51,27 @@ type LoggerConfig interface {
 	LogFileMaxAge() int
 }
 
-// Load - считывает переменные из env файла
-func Load(path string) error {
-	err := godotenv.Load(path)
-	if err != nil {
-		return err
-	}
+// PGConfig - интерфейс с методом DSN
+type PGConfig interface {
+	DSN() string
+}
 
-	return nil
+// PrometheusConfig - интерфейс для prometheus
+type PrometheusConfig interface {
+	Address() string
+	Path() string
+}
+
+// RedisConfig - интерфейс конфигурации redis
+type RedisConfig interface {
+	Address() string
+	ConnectionTimeout() time.Duration
+	MaxIdle() int
+	IdleTimeout() time.Duration
+	UserExpiration() int64
+}
+
+// SwaggerConfig - интерфейс конфигурации swagger сервера
+type SwaggerConfig interface {
+	Address() string
 }

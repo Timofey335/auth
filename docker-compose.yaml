@@ -1,11 +1,12 @@
 version: '3'
 
 volumes:
+  kafka1_volume:
+  kafka2_volume:
+  kafka3_volume:
   postgres_volume:
   redis-data:
-  kafka1:
-  kafka2:
-  kafka3:
+  prometheus_data:
 
 services:
   zookeeper:
@@ -35,6 +36,8 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0 # время задержки перед началом перебалансировки группы
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2 # минимальное количество реплик, которые должны быть в синхронизации для топика состояния транзакции
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3 # фактор репликации топика состояния транзакции
+    volumes:
+      - kafka1_volume:/var/lib/kafka/kafka1/data
 
   kafka2:
     image: confluentinc/cp-kafka:7.6.1
@@ -53,6 +56,8 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0 # время задержки перед началом перебалансировки группы
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2 # минимальное количество реплик, которые должны быть в синхронизации для топика состояния транзакции
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3 # фактор репликации топика состояния транзакции
+    volumes:
+      - kafka2_volume:/var/lib/kafka/kafka2/data
 
   kafka3:
     image: confluentinc/cp-kafka:7.6.1
@@ -71,6 +76,8 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0 # время задержки перед началом перебалансировки группы
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2 # минимальное количество реплик, которые должны быть в синхронизации для топика состояния транзакции
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3 # фактор репликации топика состояния транзакции
+    volumes:
+      - kafka3_volume:/var/lib/kafka/kafka3/data
   
   kafka-ui:
     container_name: kafka-ui
@@ -106,3 +113,12 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+  
+  prometheus:
+    image: prom/prometheus:v2.37.9
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus_data:/prometheus

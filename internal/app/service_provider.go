@@ -26,6 +26,7 @@ import (
 	"github.com/Timofey335/auth/internal/config"
 	"github.com/Timofey335/auth/internal/config/env"
 	"github.com/Timofey335/auth/internal/logger"
+	"github.com/Timofey335/auth/internal/metric"
 	"github.com/Timofey335/auth/internal/repository"
 	accessRepository "github.com/Timofey335/auth/internal/repository/access"
 	userRepository "github.com/Timofey335/auth/internal/repository/user"
@@ -42,6 +43,7 @@ type serviceProvider struct {
 	kafkaConsumerConfig config.KafkaConsumerConfig
 	loggerConfig        config.LoggerConfig
 	pgConfig            config.PGConfig
+	prometheusConfig    config.PrometheusConfig
 	redisConfig         config.RedisConfig
 	swaggerConfig       config.SwaggerConfig
 
@@ -181,7 +183,29 @@ func (s *serviceProvider) LoggerConfig() config.LoggerConfig {
 	return s.loggerConfig
 }
 
-// Logger - конфигурирует формат логгера и запись лого в файл
+// PromethueusConfig - инициализирует конфигурацию для prometheus
+func (s *serviceProvider) PromethueusConfig() config.PrometheusConfig {
+	if s.prometheusConfig == nil {
+		cfg, err := env.NewPrometheusConfig()
+		if err != nil {
+			log.Fatalf("failed to get prometheus config: %s", err.Error())
+		}
+
+		s.prometheusConfig = cfg
+	}
+
+	return s.prometheusConfig
+}
+
+// Metrics - инициализация метрик
+func (s *serviceProvider) Metrics(ctx context.Context) {
+	err := metric.Init(ctx)
+	if err != nil {
+		log.Fatalf("failed to init metrics: %v", err)
+	}
+}
+
+// Logger - конфигурирует формат логгера и запись логов в файл
 func (s *serviceProvider) Logger() {
 	cfg := s.LoggerConfig()
 
