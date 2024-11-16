@@ -112,3 +112,14 @@ grpc-load-test:
 		--total 3000 \
 		--cacert=cert/ca.cert \
 		localhost:50051
+
+grpc-error-load-test:
+	ghz \
+		--proto api/auth_v1/auth.proto \
+		--import-paths=vendor.protogen \
+		--call auth_v1.Auth_v1.GetUser\
+		--data '{"id": 200}' \
+		--rps 100 \
+		--total 3000 \
+		--cacert=cert/ca.cert \
+		localhost:50051

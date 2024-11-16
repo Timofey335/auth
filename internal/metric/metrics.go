@@ -14,7 +14,8 @@ const (
 
 // Metrics - используемые типы метрик prometheus
 type Metrics struct {
-	requestCounter prometheus.Counter
+	requestCounter  prometheus.Counter
+	responseCounter *prometheus.CounterVec
 }
 
 var metrics *Metrics
@@ -30,6 +31,16 @@ func Init(_ context.Context) error {
 				Help:      "Количество запросов к серверу",
 			},
 		),
+
+		responseCounter: promauto.NewCounterVec(
+			prometheus.CounterOpts{
+				Namespace: namespace,
+				Subsystem: "grpc",
+				Name:      appName + "_responses_total",
+				Help:      "Количество ответов от сервера",
+			},
+			[]string{"status", "method"},
+		),
 	}
 
 	return nil
@@ -37,4 +48,8 @@ func Init(_ context.Context) error {
 
 func IncRequestCounter() {
 	metrics.requestCounter.Inc()
+}
+
+func IncResponseCounter(status string, method string) {
+	metrics.responseCounter.WithLabelValues(status, method).Inc()
 }
